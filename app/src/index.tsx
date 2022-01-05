@@ -1,8 +1,8 @@
 import './index.css';
-import App from './App';
+import { App } from './App';
+import { reportWebVitals } from './reportWebVitals';
 import React from 'react';
 import ReactDOM from 'react-dom';
-import reportWebVitals from './reportWebVitals';
 import type { Metric } from 'web-vitals';
 
 ReactDOM.render(

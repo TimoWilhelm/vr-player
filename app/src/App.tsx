@@ -1,7 +1,8 @@
 import './App.css';
+import { add } from '@vr-viewer/player';
 import logo from './logo.svg';
 
-function App() {
+export function App() {
   return (
     <div className="App">
       <header className="App-header">
@@ -17,11 +18,9 @@ function App() {
           target="_blank"
           rel="noopener noreferrer"
         >
-          Learn React
+          {add(1, 2)}
         </a>
       </header>
     </div>
   );
 }
-
-export default App;

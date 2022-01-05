@@ -1,1 +1,2 @@
-export default 'a';
+export { add } from './add';
+export { subtract } from './subtract';

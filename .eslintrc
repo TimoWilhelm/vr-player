@@ -20,6 +20,8 @@
     "plugin:prettier/recommended"
   ],
   "rules": {
+    "import/prefer-default-export": "off",
+    "import/no-default-export": "error",
     "object-curly-newline": "off",
     "no-void": [
       "error",
