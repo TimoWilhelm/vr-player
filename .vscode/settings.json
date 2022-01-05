@@ -1,0 +1,27 @@
+{
+  "azureFunctions.deploySubpath": "functions",
+  "azureFunctions.postDeployTask": "npm install",
+  "azureFunctions.projectLanguage": "TypeScript",
+  "azureFunctions.projectRuntime": "~3",
+  "debug.internalConsoleOptions": "neverOpen",
+  "azureFunctions.preDeployTask": "npm prune",
+  "eslint.validate": [
+    "javascript",
+    "javascriptreact",
+    "typescript",
+    "typescriptreact",
+    "graphql"
+  ],
+  "eslint.workingDirectories": [
+    {
+      "mode": "auto"
+    }
+  ],
+  "editor.codeActionsOnSave": {
+    "source.fixAll": true
+  },
+  "files.exclude": {
+    "**/package-lock.json": true
+  },
+  "yaml.format.singleQuote": true
+}

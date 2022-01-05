@@ -1,18 +1,11 @@
 {
   "root": true,
+  "env": {
+    "es6": true
+  },
+  "parser": "@typescript-eslint/parser",
   "parserOptions": {
     "ecmaVersion": 2017
-  },
-  "settings": {
-    "import/parsers": {
-      "@typescript-eslint/parser": [
-        ".ts",
-        ".tsx"
-      ]
-    },
-    "import/resolver": {
-      "typescript": {}
-    }
   },
   "plugins": [
     "@typescript-eslint",
@@ -24,8 +17,44 @@
     "plugin:@typescript-eslint/eslint-recommended",
     "plugin:@typescript-eslint/recommended",
     "plugin:@typescript-eslint/recommended-requiring-type-checking",
-    "airbnb-base",
-    "airbnb-typescript/base",
     "plugin:prettier/recommended"
-  ]
+  ],
+  "rules": {
+    "object-curly-newline": "off",
+    "no-void": [
+      "error",
+      {
+        "allowAsStatement": true
+      }
+    ],
+    "no-unused-vars": [
+      "error",
+      {
+        "argsIgnorePattern": "^_"
+      }
+    ],
+    "react/require-default-props": "off",
+    "react/jsx-props-no-spreading": "off",
+    "@typescript-eslint/consistent-type-imports": [
+      "error",
+      {
+        "prefer": "type-imports",
+        "disallowTypeAnnotations": false
+      }
+    ],
+    "import/order": "off",
+    "sort-imports-es6-autofix/sort-imports-es6": [
+      "error",
+      {
+        "ignoreCase": false,
+        "ignoreMemberSort": false,
+        "memberSyntaxSortOrder": [
+          "none",
+          "all",
+          "multiple",
+          "single"
+        ]
+      }
+    ]
+  }
 }

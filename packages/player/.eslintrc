@@ -1,0 +1,13 @@
+{
+  "extends": [
+    "airbnb-base",
+    "airbnb-typescript/base",
+    "../../.eslintrc"
+  ],
+  "parserOptions": {
+    "sourceType": "module",
+    "project": [
+      "./tsconfig.json"
+    ]
+  }
+}

@@ -1,16 +1,14 @@
 {
   "env": {
-    "es6": true,
-    "node": true,
     "jest": true
   },
   "extends": [
     "airbnb",
     "airbnb-typescript",
     "airbnb/hooks",
-    "plugin:react/jsx-runtime"
+    "plugin:react/jsx-runtime",
+    "../.eslintrc"
   ],
-  "parser": "@typescript-eslint/parser",
   "parserOptions": {
     "sourceType": "module",
     "project": [
