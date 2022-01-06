@@ -1,5 +1,5 @@
-import { debug2 } from '@vr-viewer/player';
-import { useEffect, useMemo, useState } from 'react';
+import { play } from '@vr-viewer/player';
+import { useEffect, useState } from 'react';
 import type { Navigator, XRSession } from 'webxr';
 
 function checkForXRSupport() {
@@ -11,14 +11,6 @@ function checkForXRSupport() {
 }
 
 export function VrPlayer() {
-  const videoElement = useMemo(() => {
-    const element = document.createElement('video');
-    element.loop = true;
-    element.src = '/video/sample.mp4';
-
-    return element;
-  }, []);
-
   const [xrSupported, setXrSupported] = useState<boolean | undefined>(
     undefined,
   );
@@ -48,11 +40,11 @@ export function VrPlayer() {
     if (xrSession) {
       xrNav.xr?.addEventListener('end', onXrSessionEnd);
 
-      void debug2(xrSession, videoElement, 'stereoLeftRight');
+      play(xrSession, '/video/sample.mp4', 'stereoLeftRight');
     }
 
     return xrNav.xr?.removeEventListener('end', onXrSessionEnd);
-  }, [xrSession, videoElement]);
+  }, [xrSession]);
 
   const requestXrSession = async () => {
     if (xrSupported && !xrSession) {
