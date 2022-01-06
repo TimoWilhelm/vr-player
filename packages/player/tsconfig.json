@@ -1,8 +1,10 @@
 {
   "compilerOptions": {
+    "baseUrl": "src",
     "target": "es5",
     "lib": [
-      "esnext"
+      "ESNext",
+      "DOM",
     ],
     "allowJs": false,
     "skipLibCheck": true,
@@ -16,6 +18,7 @@
     "resolveJsonModule": true,
     "isolatedModules": true,
     "declaration": true,
+    "sourceMap": true,
     "outDir": "./lib",
   },
   "include": [

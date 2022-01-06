@@ -1,5 +1,5 @@
 import './index.css';
-import { App } from './App';
+import { App } from 'components/App';
 import { reportWebVitals } from './reportWebVitals';
 import React from 'react';
 import ReactDOM from 'react-dom';

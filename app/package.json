@@ -11,6 +11,7 @@
     "@types/node": "^16.11.19",
     "@types/react": "^17.0.38",
     "@types/react-dom": "^17.0.11",
+    "@types/webxr": "^0.2.3",
     "@vr-viewer/player": "*",
     "eslint-config-airbnb": "^19.0.4",
     "react": "^17.0.2",
