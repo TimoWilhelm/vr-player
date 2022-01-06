@@ -1,4 +1,5 @@
 import './index.css';
+import './polyfills';
 import { App } from 'components/App';
 import { reportWebVitals } from './reportWebVitals';
 import React from 'react';

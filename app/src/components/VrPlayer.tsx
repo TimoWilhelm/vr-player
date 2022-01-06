@@ -1,13 +1,12 @@
 import { play } from '@vr-viewer/player';
 import { useEffect, useState } from 'react';
-import type { Navigator, XRSession } from 'webxr';
+import type { XRSession } from 'webxr';
 
 function checkForXRSupport() {
-  return (
-    (navigator as unknown as Navigator).xr?.isSessionSupported(
-      'immersive-vr',
-    ) ?? false
-  );
+  if (!navigator.xr) {
+    return Promise.resolve(false);
+  }
+  return navigator.xr.isSessionSupported('immersive-vr');
 }
 
 export function VrPlayer() {
@@ -21,13 +20,11 @@ export function VrPlayer() {
       void checkForXRSupport().then(setXrSupported);
     };
 
-    const xrNav = navigator as unknown as Navigator;
-
-    xrNav.xr?.addEventListener('devicechange', onDevicechange);
+    navigator.xr?.addEventListener('devicechange', onDevicechange);
 
     onDevicechange();
 
-    return xrNav.xr?.removeEventListener('devicechange', onDevicechange);
+    return navigator.xr?.removeEventListener('devicechange', onDevicechange);
   }, []);
 
   useEffect(() => {
@@ -35,15 +32,13 @@ export function VrPlayer() {
       setXrSession(undefined);
     };
 
-    const xrNav = navigator as unknown as Navigator;
-
     if (xrSession) {
-      xrNav.xr?.addEventListener('end', onXrSessionEnd);
+      navigator.xr?.addEventListener('end', onXrSessionEnd);
 
       play(xrSession, '/video/sample.mp4', 'stereoLeftRight');
     }
 
-    return xrNav.xr?.removeEventListener('end', onXrSessionEnd);
+    return navigator.xr?.removeEventListener('end', onXrSessionEnd);
   }, [xrSession]);
 
   const requestXrSession = async () => {

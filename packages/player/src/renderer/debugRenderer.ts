@@ -3,6 +3,7 @@ import { Renderer } from './renderer';
 import { mat4 } from 'gl-matrix';
 import type { DisplayMode } from './displayMode';
 import type { RenderProps } from './renderProps';
+import type { Texture2DOptions } from 'regl';
 
 export class DebugRenderer extends Renderer {
   constructor(
@@ -17,7 +18,10 @@ export class DebugRenderer extends Renderer {
     const { canvas } = this.regl._gl;
 
     const video = await this.loadVideo();
-    const texture = this.regl.texture(video);
+    video.muted = true;
+
+    const textureProps: Texture2DOptions = { data: video };
+    const texture = this.regl.texture(textureProps);
     const aspectRatio = this.getAspectRation(video);
 
     const screenHeight = 300;
@@ -47,7 +51,7 @@ export class DebugRenderer extends Renderer {
         model,
         view,
         projection,
-        texture: texture.subimage(video),
+        texture: texture.subimage(textureProps),
         viewport: { x: 0, y: 0, width: canvas.width, height: canvas.height },
         texCoordScaleOffset: offset,
       };

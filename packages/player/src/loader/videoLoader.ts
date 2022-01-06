@@ -1,15 +1,27 @@
 export class VideoLoader {
-  public static async load(videoSrc: string): Promise<HTMLVideoElement> {
+  public static async load(
+    videoSrc: string,
+    streaming = false,
+  ): Promise<HTMLVideoElement> {
     const video = document.createElement('video');
-    video.src = videoSrc;
     video.loop = true;
 
-    const videoLoaded = new Promise((resolve) => {
+    if (streaming) {
+      video.src = videoSrc;
+    } else {
+      const response = await fetch(videoSrc);
+      const blob = await response.blob();
+      const url = URL.createObjectURL(blob);
+      video.src = url;
+    }
+
+    const frameLoaded = new Promise((resolve) => {
       video.onloadeddata = resolve;
     });
 
     void video.play();
-    await videoLoaded;
+
+    await frameLoaded;
 
     return video;
   }

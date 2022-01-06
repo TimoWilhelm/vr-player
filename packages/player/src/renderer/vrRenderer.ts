@@ -3,6 +3,7 @@ import { Renderer } from './renderer';
 import { mat4 } from 'gl-matrix';
 import type { DisplayMode } from './displayMode';
 import type { RenderProps } from './renderProps';
+import type { Texture2DOptions } from 'regl';
 import type { XRFrame, XRFrameRequestCallback, XRSession } from 'webxr';
 
 export class VrRenderer extends Renderer {
@@ -28,13 +29,16 @@ export class VrRenderer extends Renderer {
     });
 
     const video = await this.loadVideo();
-    const texture = this.regl.texture(video);
+    video.muted = true;
+
+    const textureProps: Texture2DOptions = { data: video };
+    const texture = this.regl.texture(textureProps);
     const aspectRatio = this.getAspectRation(video);
 
     const screenHeight = 300;
 
     const model = mat4.create();
-    mat4.translate(model, model, [0, 0, -screenHeight]);
+    mat4.translate(model, model, [0, 0, -2 * screenHeight]);
     // scale according to aspect ratio
     mat4.scale(model, model, [screenHeight * aspectRatio, screenHeight, 1]);
 
@@ -73,7 +77,7 @@ export class VrRenderer extends Renderer {
           model,
           view: poseView.transform.inverse.matrix,
           projection: poseView.projectionMatrix,
-          texture: texture.subimage(video),
+          texture: texture.subimage(textureProps),
           viewport: glLayer.getViewport(poseView),
           texCoordScaleOffset:
             poseView.eye === 'left' ? offsets[0] : offsets[1],
