@@ -1,17 +1,19 @@
 /* eslint-disable no-underscore-dangle */
 import { Renderer } from './renderer';
 import { mat4 } from 'gl-matrix';
-import type { DisplayMode } from './displayMode';
+import type { Format } from './format';
+import type { Layout } from './layout';
 import type { RenderProps } from './renderProps';
 import type { Texture2DOptions } from 'regl';
 
 export class DebugRenderer extends Renderer {
   constructor(
     videoSrc: string,
-    displayMode: DisplayMode,
+    layout: Layout,
+    format: Format,
     private readonly view: 'left' | 'right' = 'left',
   ) {
-    super(videoSrc, displayMode);
+    super(videoSrc, layout, format);
   }
 
   async start(): Promise<void> {
@@ -24,9 +26,10 @@ export class DebugRenderer extends Renderer {
     const texture = this.regl.texture(textureProps);
     const aspectRatio = this.getAspectRation(video);
 
-    const screenHeight = 300;
+    const screenHeight = 1;
 
     const model = mat4.create();
+
     mat4.translate(model, model, [0, 0, -screenHeight]);
     // scale according to aspect ratio
     mat4.scale(model, model, [screenHeight * aspectRatio, screenHeight, 1]);

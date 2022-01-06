@@ -1,12 +1,14 @@
 import { VrRenderer } from './renderer/vrRenderer';
-import type { DisplayMode } from './renderer/displayMode';
+import type { Format } from './renderer/format';
+import type { Layout } from './renderer/layout';
 import type { XRSession } from 'webxr';
 
 export const play = (
   xrSession: XRSession,
   videoSrc: string,
-  displayMode: DisplayMode,
+  layout: Layout,
+  format: Format,
 ) => {
-  const renderer = new VrRenderer(xrSession, videoSrc, displayMode);
+  const renderer = new VrRenderer(xrSession, videoSrc, layout, format);
   void renderer.start();
 };

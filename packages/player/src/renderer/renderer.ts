@@ -1,6 +1,8 @@
 import { VideoLoader } from '../loader/videoLoader';
 import reglInit from 'regl';
-import type { DisplayMode } from './displayMode';
+import sphere from 'primitive-icosphere';
+import type { Format } from './format';
+import type { Layout } from './layout';
 import type { Regl } from 'regl';
 import type { RenderProps } from './renderProps';
 
@@ -14,8 +16,11 @@ export abstract class Renderer {
 
   constructor(
     private readonly videoSrc: string,
-    private readonly displayMode: DisplayMode,
+    protected readonly layout: Layout,
+    protected readonly format: Format,
   ) {
+    const mesh = this.getMesh();
+
     this.regl = reglInit({ pixelRatio: 1 });
 
     this.cmdRender = this.regl({
@@ -23,18 +28,32 @@ export abstract class Renderer {
       precision highp float;
 
       attribute vec3 position;
+      attribute vec3 normal;
       uniform vec4 texCoordScaleOffset;
-      uniform mat4 model, view, projection;
+      uniform mat4 model;
+      uniform mat4 view;
+      uniform mat4 projection;
 
       varying vec2 uv;
 
-      vec2 normalizeCoords(vec2 position) {
-        return position * vec2(1, -1) / 2.0 + vec2(0.5, 0.5);
-     }
+      vec2 mapToScreen(vec2 position) {
+        return (position * vec2(1, -1) / 2.0 + vec2(0.5, 0.5)) * texCoordScaleOffset.xy + texCoordScaleOffset.zw;
+      }
+
+      vec2 mapToHalfCircle(vec3 normal) {
+        if(normal.z > 0.0) {
+          return vec2(-1.0, -1.0);
+        }
+        return vec2(0.5 + atan(normal.z, normal.x) / 6.28318531, 0.5 + asin(-normal.y) / 3.14159265) * vec2(2.0, 1.0) * texCoordScaleOffset.xy + texCoordScaleOffset.zw;
+      }
 
       void main() {
         gl_Position = projection * view * model * vec4(position, 1);
-        uv = normalizeCoords(position.xy) * texCoordScaleOffset.xy + texCoordScaleOffset.zw;
+        uv = ${
+          this.format === '180'
+            ? 'mapToHalfCircle(normal)'
+            : 'mapToScreen(position.xy)'
+        };
       }`,
       frag: `
       precision highp float;
@@ -44,15 +63,15 @@ export abstract class Renderer {
       varying vec2 uv;
 
       void main() {
-        gl_FragColor = texture2D(texture, uv);
+        if(uv.x < 0.0 || uv.y < 0.0) {
+          gl_FragColor = vec4(0.0, 0.0, 0.0, 1.0);
+        } else {
+          gl_FragColor = texture2D(texture, uv);
+        }
       }`,
       attributes: {
-        position: [
-          [-1, 1, 0],
-          [-1, -1, 0],
-          [1, -1, 0],
-          [1, 1, 0],
-        ],
+        position: mesh.positions,
+        normal: mesh.normals,
       },
       // TODO: https://github.com/regl-project/regl/pull/632
       uniforms: {
@@ -65,17 +84,43 @@ export abstract class Renderer {
         ),
       },
       viewport: this.regl.prop<RenderProps, 'viewport'>('viewport'),
-      elements: [
-        [0, 2, 1],
-        [0, 3, 2],
-      ],
+      elements: mesh.cells,
     });
   }
 
   abstract start(): Promise<void>;
 
+  protected getMesh() {
+    switch (this.format) {
+      case '180':
+        return sphere(1, {
+          subdivisions: 5,
+        });
+
+      case 'screen':
+      // falls through
+      default:
+        return {
+          positions: [
+            [-1, 1, 0],
+            [-1, -1, 0],
+            [1, -1, 0],
+            [1, 1, 0],
+          ],
+          cells: [
+            [0, 2, 1],
+            [0, 3, 2],
+          ],
+          normals: [
+            [0, 0, 1],
+            [0, 0, 1],
+          ],
+        };
+    }
+  }
+
   protected getTexCoordScaleOffsets() {
-    switch (this.displayMode) {
+    switch (this.layout) {
       case 'stereoTopBottom':
         return [
           new Float32Array([1.0, 0.5, 0.0, 0.0]),
@@ -97,7 +142,7 @@ export abstract class Renderer {
   }
 
   protected getAspectRation(video: HTMLVideoElement) {
-    switch (this.displayMode) {
+    switch (this.layout) {
       case 'stereoTopBottom':
         return (video.videoWidth / video.videoHeight) * 0.5;
       case 'stereoLeftRight':

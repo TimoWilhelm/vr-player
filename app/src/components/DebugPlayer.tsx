@@ -6,7 +6,7 @@ export function DebugPlayer() {
       <button
         type="button"
         onClick={() => {
-          debug('/video/sample.mp4', 'stereoLeftRight');
+          debug('/video/sample.mp4', 'stereoLeftRight', '180');
         }}
       >
         Debug

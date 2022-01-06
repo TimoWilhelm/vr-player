@@ -1,7 +1,8 @@
 /* eslint-disable no-underscore-dangle */
 import { Renderer } from './renderer';
 import { mat4 } from 'gl-matrix';
-import type { DisplayMode } from './displayMode';
+import type { Format } from './format';
+import type { Layout } from './layout';
 import type { RenderProps } from './renderProps';
 import type { Texture2DOptions } from 'regl';
 import type { XRFrame, XRFrameRequestCallback, XRSession } from 'webxr';
@@ -10,9 +11,10 @@ export class VrRenderer extends Renderer {
   constructor(
     private readonly xrSession: XRSession,
     videoSrc: string,
-    displayMode: DisplayMode,
+    layout: Layout,
+    format: Format,
   ) {
-    super(videoSrc, displayMode);
+    super(videoSrc, layout, format);
   }
 
   async start(): Promise<void> {
@@ -35,12 +37,15 @@ export class VrRenderer extends Renderer {
     const texture = this.regl.texture(textureProps);
     const aspectRatio = this.getAspectRation(video);
 
-    const screenHeight = 300;
+    const screenHeight = 1;
 
     const model = mat4.create();
-    mat4.translate(model, model, [0, 0, -2 * screenHeight]);
-    // scale according to aspect ratio
-    mat4.scale(model, model, [screenHeight * aspectRatio, screenHeight, 1]);
+
+    if (this.format === 'screen') {
+      mat4.translate(model, model, [0, 0, -2 * screenHeight]);
+      // scale according to aspect ratio
+      mat4.scale(model, model, [screenHeight * aspectRatio, screenHeight, 1]);
+    }
 
     const offsets = this.getTexCoordScaleOffsets();
     const xrReferenceSpace = await this.xrSession.requestReferenceSpace(

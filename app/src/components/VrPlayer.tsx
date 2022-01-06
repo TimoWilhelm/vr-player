@@ -35,7 +35,7 @@ export function VrPlayer() {
     if (xrSession) {
       navigator.xr?.addEventListener('end', onXrSessionEnd);
 
-      play(xrSession, '/video/sample.mp4', 'stereoLeftRight');
+      play(xrSession, '/video/sample.mp4', 'stereoLeftRight', '180');
     }
 
     return navigator.xr?.removeEventListener('end', onXrSessionEnd);
