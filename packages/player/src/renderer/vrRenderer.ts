@@ -23,7 +23,7 @@ export class VrRenderer extends Renderer {
       // @ts-expect-error unstable API
       // eslint-disable-next-line @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-assignment
       baseLayer: new XRWebGLLayer(this.xrSession, this.regl._gl),
-      depthFar: 5000,
+      depthFar: this.xrSession.renderState.depthFar,
       depthNear: this.xrSession.renderState.depthNear,
     });
 
@@ -31,14 +31,12 @@ export class VrRenderer extends Renderer {
     const texture = this.regl.texture(video);
     const aspectRatio = this.getAspectRation(video);
 
+    const screenHeight = 300;
+
     const model = mat4.create();
-    mat4.translate(model, model, [0, 0, -2000]);
+    mat4.translate(model, model, [0, 0, -screenHeight]);
     // scale according to aspect ratio
-    mat4.scale(model, model, [
-      video.videoWidth * aspectRatio,
-      video.videoHeight,
-      1,
-    ]);
+    mat4.scale(model, model, [screenHeight * aspectRatio, screenHeight, 1]);
 
     const offsets = this.getTexCoordScaleOffsets();
     const xrReferenceSpace = await this.xrSession.requestReferenceSpace(

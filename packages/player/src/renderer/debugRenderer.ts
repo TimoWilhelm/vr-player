@@ -20,14 +20,12 @@ export class DebugRenderer extends Renderer {
     const texture = this.regl.texture(video);
     const aspectRatio = this.getAspectRation(video);
 
+    const screenHeight = 300;
+
     const model = mat4.create();
-    mat4.translate(model, model, [0, 0, -2000]);
+    mat4.translate(model, model, [0, 0, -screenHeight]);
     // scale according to aspect ratio
-    mat4.scale(model, model, [
-      video.videoWidth * aspectRatio,
-      video.videoHeight,
-      1,
-    ]);
+    mat4.scale(model, model, [screenHeight * aspectRatio, screenHeight, 1]);
 
     const view = mat4.lookAt(mat4.create(), [0, 0, 0], [0, 0, -1], [0, 1, 0]);
 
