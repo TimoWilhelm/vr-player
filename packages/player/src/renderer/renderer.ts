@@ -16,13 +16,13 @@ export abstract class Renderer {
   >;
 
   constructor(
-    private readonly canvas: HTMLCanvasElement,
+    protected readonly canvas: HTMLCanvasElement,
     protected readonly layout: Layout,
     protected readonly format: Format,
   ) {
     const mesh = this.getMesh();
 
-    this.regl = reglInit({ pixelRatio: 1, canvas });
+    this.regl = reglInit({ pixelRatio: 1, canvas: this.canvas });
 
     this.cmdRender = this.regl({
       vert: `

@@ -18,8 +18,6 @@ export class DebugRenderer extends Renderer {
   }
 
   start(): Promise<void> {
-    const { canvas } = this.regl._gl;
-
     const textureProps: Texture2DOptions = { data: this.video };
     const texture = this.regl.texture(textureProps);
     const aspectRatio = this.getAspectRation(this.video);
@@ -37,7 +35,7 @@ export class DebugRenderer extends Renderer {
     const projection = mat4.perspective(
       mat4.create(),
       Math.PI / 2,
-      canvas.width / canvas.height,
+      this.canvas.width / this.canvas.height,
       0.01,
       Infinity,
     );
@@ -53,7 +51,12 @@ export class DebugRenderer extends Renderer {
         view,
         projection,
         texture: texture.subimage(textureProps),
-        viewport: { x: 0, y: 0, width: canvas.width, height: canvas.height },
+        viewport: {
+          x: 0,
+          y: 0,
+          width: this.canvas.width,
+          height: this.canvas.height,
+        },
         texCoordScaleOffset: offset,
       };
       this.cmdRender(props);

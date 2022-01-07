@@ -22,6 +22,7 @@ export function App() {
 
   useEffect(() => {
     const video = videoRef.current;
+
     const onLoadeddata = () => {
       void (async () => {
         if (!video) return;
@@ -75,7 +76,7 @@ export function App() {
           {...getRootProps()}
         >
           <input {...getInputProps()} />
-          {file && videoRef.current && ready && debug && (
+          {videoRef.current && ready && debug && (
             <DebugPlayer
               video={videoRef.current}
               canvas={canvasRef.current}
@@ -83,7 +84,7 @@ export function App() {
               format={format}
             />
           )}
-          {file && videoRef.current && ready && xrSession && (
+          {videoRef.current && ready && xrSession && (
             <VrPlayer
               xrSession={xrSession}
               video={videoRef.current}
@@ -200,15 +201,23 @@ export function App() {
               </button>
             </div>
           </div>
-          <div className="flex-1">
+          <div className="flex-1 overflow-auto py-4">
             <video
-              className="h-full"
+              hidden={!ready}
+              className={classNames('h-full mx-auto', { hidden: !ready })}
               ref={videoRef}
-              src=""
               muted
               controls
               loop
             />
+            <div
+              hidden={ready}
+              className={classNames('h-full flex', { hidden: ready })}
+            >
+              <span className="m-auto text-xl font-medium">
+                Just drag and drop a video file to play!
+              </span>
+            </div>
           </div>
         </div>
       )}
