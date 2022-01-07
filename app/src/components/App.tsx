@@ -1,3 +1,4 @@
+import { BugNotification } from './BugNotification';
 import { DebugPlayer } from 'components/DebugPlayer';
 import { VrPlayer } from 'components/VrPlayer';
 import { useCallback, useEffect, useRef, useState } from 'react';
@@ -64,9 +65,11 @@ export function App() {
       {({ getRootProps, getInputProps }) => (
         <>
           <div
-            className="h-full flex flex-col bg-gray-900 text-sm font-medium text-white"
+            className="h-full flex flex-col bg-gray-900 text-white"
             {...getRootProps()}
           >
+            <BugNotification />
+
             {videoRef.current && canvasRef.current && ready && debug && (
               <DebugPlayer
                 video={videoRef.current}
@@ -85,7 +88,7 @@ export function App() {
               />
             )}
 
-            <div className="p-4 flex space-x-4">
+            <div className="p-4 flex justify-center space-x-4">
               <div className="rounded-lg shadow-sm">
                 <button
                   type="button"
@@ -113,23 +116,19 @@ export function App() {
                   }
                 </button>
               </div>
-              <div className="rounded-lg shadow-sm">
-                <button
-                  type="button"
-                  className={classNames(
-                    'py-2 px-4 text-sm font-medium text-white bg-gray-700 hover:bg-gray-600 border border-gray-600 rounded-lg',
-                  )}
-                >
-                  <label htmlFor="file-input" className="cursor-pointer">
-                    Upload
-                    <input
-                      id="file-input"
-                      ref={fileInputRef}
-                      {...getInputProps()}
-                    />
-                  </label>
-                </button>
-              </div>
+              <button
+                type="button"
+                className="py-2 px-4 text-sm font-medium text-white bg-gray-700 hover:bg-gray-600 border border-gray-600 rounded-lg shadow-sm"
+              >
+                <label htmlFor="file-input" className="cursor-pointer">
+                  Upload
+                  <input
+                    id="file-input"
+                    ref={fileInputRef}
+                    {...getInputProps()}
+                  />
+                </label>
+              </button>
               <div className="inline-flex rounded-lg shadow-sm" role="group">
                 <button
                   type="button"
@@ -195,19 +194,19 @@ export function App() {
                   180°
                 </button>
               </div>
-              <div className="rounded-lg shadow-sm">
-                <button
-                  type="button"
-                  className={classNames(
-                    'py-2 px-4 text-sm font-medium text-white bg-gray-700 hover:bg-gray-600 border border-gray-600 rounded-lg',
-                    { 'bg-cyan-700 hover:bg-cyan-600': debug },
-                  )}
-                  aria-current={debug}
-                  onClick={() => setDebug(!debug)}
-                >
-                  Debug
-                </button>
-              </div>
+              <button
+                type="button"
+                className={classNames(
+                  'py-2 px-4 text-sm font-medium text-white bg-gray-700 hover:bg-gray-600 border border-gray-600 rounded-lg shadow-sm',
+                  { 'bg-cyan-700 hover:bg-cyan-600': debug },
+                )}
+                aria-current={debug}
+                onClick={() => setDebug(!debug)}
+              >
+                Debug
+              </button>
+              <div role="separator" className="flex-1" />
+              <div className="text-lg font-medium m-auto">αlpha</div>
             </div>
             <div className="flex-1 overflow-auto py-4">
               {/* eslint-disable-next-line jsx-a11y/media-has-caption */}
