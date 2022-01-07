@@ -25,16 +25,11 @@ export function App() {
     const video = videoRef.current;
 
     const onLoadeddata = () => {
-      void (async () => {
-        if (!video) return;
+      if (!video) return;
 
-        // TODO: fix this...
-        await video.play();
-        video.pause();
-        setTimeout(() => {
-          setReady(true);
-        }, 10);
-      })();
+      setTimeout(() => {
+        setReady(true);
+      }, 10);
     };
 
     video?.addEventListener('loadeddata', onLoadeddata);
@@ -215,12 +210,14 @@ export function App() {
               </div>
             </div>
             <div className="flex-1 overflow-auto py-4">
+              {/* eslint-disable-next-line jsx-a11y/media-has-caption */}
               <video
                 hidden={!ready}
                 className={classNames('h-full mx-auto', { hidden: !ready })}
                 ref={videoRef}
-                muted
                 controls
+                muted
+                autoPlay
                 loop
               />
               <div
