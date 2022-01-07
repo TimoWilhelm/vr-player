@@ -10,6 +10,7 @@ import type { Format, Layout } from '@vr-viewer/player';
 export function App() {
   const videoRef = useRef<HTMLVideoElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   const [layout, setLayout] = useState<Layout>('stereoLeftRight');
   const [format, setFormat] = useState<Format>('180');
@@ -71,7 +72,6 @@ export function App() {
             className="h-full flex flex-col bg-gray-900 text-sm font-medium text-white"
             {...getRootProps()}
           >
-            <input {...getInputProps()} />
             {videoRef.current && canvasRef.current && ready && debug && (
               <DebugPlayer
                 video={videoRef.current}
@@ -91,7 +91,7 @@ export function App() {
             )}
 
             <div className="p-4 flex space-x-4">
-              <div>
+              <div className="rounded-lg shadow-sm">
                 <button
                   type="button"
                   className={classNames(
@@ -118,7 +118,24 @@ export function App() {
                   }
                 </button>
               </div>
-              <div className="inline-flex rounded-md shadow-sm" role="group">
+              <div className="rounded-lg shadow-sm">
+                <button
+                  type="button"
+                  className={classNames(
+                    'py-2 px-4 text-sm font-medium text-white bg-gray-700 hover:bg-gray-600 border border-gray-600 rounded-lg',
+                  )}
+                >
+                  <label htmlFor="file-input" className="cursor-pointer">
+                    Upload
+                    <input
+                      id="file-input"
+                      ref={fileInputRef}
+                      {...getInputProps()}
+                    />
+                  </label>
+                </button>
+              </div>
+              <div className="inline-flex rounded-lg shadow-sm" role="group">
                 <button
                   type="button"
                   className={classNames(
@@ -159,7 +176,7 @@ export function App() {
                   Top | Bottom
                 </button>
               </div>
-              <div className="inline-flex rounded-md shadow-sm" role="group">
+              <div className="inline-flex rounded-lg shadow-sm" role="group">
                 <button
                   type="button"
                   className={classNames(
@@ -183,7 +200,7 @@ export function App() {
                   180°
                 </button>
               </div>
-              <div>
+              <div className="rounded-lg shadow-sm">
                 <button
                   type="button"
                   className={classNames(
