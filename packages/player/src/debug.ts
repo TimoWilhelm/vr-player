@@ -1,8 +1,13 @@
 import { DebugRenderer } from './renderer/debugRenderer';
-import type { Format } from './renderer/format';
-import type { Layout } from './renderer/layout';
+import type { Format } from './format';
+import type { Layout } from './layout';
 
-export const debug = (videoSrc: string, layout: Layout, format: Format) => {
-  const renderer = new DebugRenderer(videoSrc, layout, format);
+export const debug = (
+  video: HTMLVideoElement,
+  canvas: HTMLCanvasElement,
+  layout: Layout,
+  format: Format,
+) => {
+  const renderer = new DebugRenderer(video, canvas, layout, format);
   void renderer.start();
 };

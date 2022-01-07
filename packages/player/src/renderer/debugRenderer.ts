@@ -1,30 +1,28 @@
 /* eslint-disable no-underscore-dangle */
 import { Renderer } from './renderer';
 import { mat4 } from 'gl-matrix';
-import type { Format } from './format';
-import type { Layout } from './layout';
+import type { Format } from '../format';
+import type { Layout } from '../layout';
 import type { RenderProps } from './renderProps';
 import type { Texture2DOptions } from 'regl';
 
 export class DebugRenderer extends Renderer {
   constructor(
-    videoSrc: string,
+    private readonly video: HTMLVideoElement,
+    canvas: HTMLCanvasElement,
     layout: Layout,
     format: Format,
     private readonly view: 'left' | 'right' = 'left',
   ) {
-    super(videoSrc, layout, format);
+    super(canvas, layout, format);
   }
 
-  async start(): Promise<void> {
+  start(): Promise<void> {
     const { canvas } = this.regl._gl;
 
-    const video = await this.loadVideo();
-    video.muted = true;
-
-    const textureProps: Texture2DOptions = { data: video };
+    const textureProps: Texture2DOptions = { data: this.video };
     const texture = this.regl.texture(textureProps);
-    const aspectRatio = this.getAspectRation(video);
+    const aspectRatio = this.getAspectRation(this.video);
 
     const screenHeight = 1;
 
@@ -64,5 +62,7 @@ export class DebugRenderer extends Renderer {
     };
 
     window.requestAnimationFrame(drawLoop);
+
+    return Promise.resolve();
   }
 }

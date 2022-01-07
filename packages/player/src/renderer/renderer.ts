@@ -1,12 +1,13 @@
-import { VideoLoader } from '../loader/videoLoader';
 import reglInit from 'regl';
 import sphere from 'primitive-icosphere';
-import type { Format } from './format';
-import type { Layout } from './layout';
+import type { Format } from '../format';
+import type { Layout } from '../layout';
 import type { Regl } from 'regl';
 import type { RenderProps } from './renderProps';
 
 export abstract class Renderer {
+  abstract start(): Promise<void>;
+
   protected readonly regl: Regl;
 
   protected readonly cmdRender: reglInit.DrawCommand<
@@ -15,13 +16,13 @@ export abstract class Renderer {
   >;
 
   constructor(
-    private readonly videoSrc: string,
+    private readonly canvas: HTMLCanvasElement,
     protected readonly layout: Layout,
     protected readonly format: Format,
   ) {
     const mesh = this.getMesh();
 
-    this.regl = reglInit({ pixelRatio: 1 });
+    this.regl = reglInit({ pixelRatio: 1, canvas });
 
     this.cmdRender = this.regl({
       vert: `
@@ -41,9 +42,6 @@ export abstract class Renderer {
       }
 
       vec2 mapToHalfCircle(vec3 normal) {
-        if(normal.z > 0.0) {
-          return vec2(-1.0, -1.0);
-        }
         return vec2(0.5 + atan(normal.z, normal.x) / 6.28318531, 0.5 + asin(-normal.y) / 3.14159265) * vec2(2.0, 1.0) * texCoordScaleOffset.xy + texCoordScaleOffset.zw;
       }
 
@@ -63,11 +61,7 @@ export abstract class Renderer {
       varying vec2 uv;
 
       void main() {
-        if(uv.x < 0.0 || uv.y < 0.0) {
-          gl_FragColor = vec4(0.0, 0.0, 0.0, 1.0);
-        } else {
           gl_FragColor = texture2D(texture, uv);
-        }
       }`,
       attributes: {
         position: mesh.positions,
@@ -88,14 +82,14 @@ export abstract class Renderer {
     });
   }
 
-  abstract start(): Promise<void>;
-
   protected getMesh() {
     switch (this.format) {
-      case '180':
-        return sphere(1, {
+      case '180': {
+        const s = sphere(1, {
           subdivisions: 5,
         });
+        return s;
+      }
 
       case 'screen':
       // falls through
@@ -152,9 +146,5 @@ export abstract class Renderer {
       default:
         return video.videoWidth / video.videoHeight;
     }
-  }
-
-  protected async loadVideo() {
-    return VideoLoader.load(this.videoSrc);
   }
 }
