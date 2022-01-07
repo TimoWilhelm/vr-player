@@ -9,13 +9,16 @@
    xmlns="http://www.w3.org/2000/svg"
    xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
    xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
-   width="23.153191mm"
-   height="21.650927mm"
-   viewBox="0 0 23.153191 21.650927"
+   width="26mm"
+   height="26mm"
+   viewBox="0 0 25.999999 26.000001"
    version="1.1"
    id="svg4668"
    inkscape:version="0.92.4 (5da689c313, 2019-01-14)"
-   sodipodi:docname="icon.svg">
+   sodipodi:docname="icon.svg"
+   inkscape:export-filename="D:\Workspace\vr-player\org\icon.png"
+   inkscape:export-xdpi="560.66998"
+   inkscape:export-ydpi="560.66998">
   <defs
      id="defs4662" />
   <sodipodi:namedview
@@ -23,11 +26,11 @@
      pagecolor="#ffffff"
      bordercolor="#666666"
      borderopacity="1.0"
-     inkscape:pageopacity="0.0"
+     inkscape:pageopacity="1"
      inkscape:pageshadow="2"
      inkscape:zoom="3.959798"
-     inkscape:cx="-39.000415"
-     inkscape:cy="68.602301"
+     inkscape:cx="-75.761698"
+     inkscape:cy="76.161418"
      inkscape:document-units="mm"
      inkscape:current-layer="layer1"
      showgrid="false"
@@ -35,7 +38,12 @@
      inkscape:window-height="1369"
      inkscape:window-x="-8"
      inkscape:window-y="-8"
-     inkscape:window-maximized="1" />
+     inkscape:window-maximized="1"
+     fit-margin-top="2"
+     fit-margin-right="2"
+     fit-margin-left="2"
+     fit-margin-bottom="2"
+     units="mm" />
   <metadata
      id="metadata4665">
     <rdf:RDF>
@@ -52,7 +60,7 @@
      inkscape:label="Layer 1"
      inkscape:groupmode="layer"
      id="layer1"
-     transform="translate(-110.88769,-70.728109)">
+     transform="translate(-108.88769,-68.379036)">
     <circle
        style="fill:#ffb8b8;stroke-width:0.26458332"
        cx="72.363106"

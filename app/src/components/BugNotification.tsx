@@ -15,7 +15,7 @@ export function BugNotification() {
         <span>
           Please note that chromium based browsers currently have an{' '}
           <a
-            href="https://bugs.chromium.org/p/chromium/issues/detail?id=91208"
+            href="https://bugs.chromium.org/p/chromium/issues/detail?id=612542"
             className="text-blue-400 underline"
           >
             issue
