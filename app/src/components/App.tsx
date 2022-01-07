@@ -9,7 +9,7 @@ import type { Format, Layout } from '@vr-viewer/player';
 
 export function App() {
   const videoRef = useRef<HTMLVideoElement>(null);
-  const canvasRef = useRef<HTMLCanvasElement>(document.createElement('canvas'));
+  const canvasRef = useRef<HTMLCanvasElement>(null);
 
   const [layout, setLayout] = useState<Layout>('stereoLeftRight');
   const [format, setFormat] = useState<Format>('180');
@@ -71,155 +71,166 @@ export function App() {
       onDrop={onFileDrop}
     >
       {({ getRootProps, getInputProps }) => (
-        <div
-          className="h-full flex flex-col bg-gray-900 text-sm font-medium text-white"
-          {...getRootProps()}
-        >
-          <input {...getInputProps()} />
-          {videoRef.current && ready && debug && (
-            <DebugPlayer
-              video={videoRef.current}
-              canvas={canvasRef.current}
-              layout={layout}
-              format={format}
-            />
-          )}
-          {videoRef.current && ready && xrSession && (
-            <VrPlayer
-              xrSession={xrSession}
-              video={videoRef.current}
-              canvas={canvasRef.current}
-              layout={layout}
-              format={format}
-            />
-          )}
+        <>
+          <div
+            className="h-full flex flex-col bg-gray-900 text-sm font-medium text-white"
+            {...getRootProps()}
+          >
+            <input {...getInputProps()} />
+            {videoRef.current && canvasRef.current && ready && debug && (
+              <DebugPlayer
+                video={videoRef.current}
+                canvas={canvasRef.current}
+                layout={layout}
+                format={format}
+              />
+            )}
+            {videoRef.current && canvasRef.current && ready && xrSession && (
+              <VrPlayer
+                xrSession={xrSession}
+                video={videoRef.current}
+                canvas={canvasRef.current}
+                layout={layout}
+                format={format}
+              />
+            )}
 
-          <div className="p-4 flex space-x-4">
-            <div>
-              <button
-                type="button"
-                className={classNames(
-                  'py-2 px-4 text-sm font-medium text-white bg-gray-700 hover:bg-gray-600 border border-gray-600 rounded-lg disabled:opacity-50',
-                  { 'bg-cyan-700 hover:bg-cyan-600': Boolean(xrSession) },
-                )}
-                aria-current={Boolean(xrSession)}
-                disabled={!xrSupported}
-                onClick={() => {
-                  if (xrSession) {
-                    void xrSession.end();
-                  } else {
-                    requestXrSession();
+            <div className="p-4 flex space-x-4">
+              <div>
+                <button
+                  type="button"
+                  className={classNames(
+                    'py-2 px-4 text-sm font-medium text-white bg-gray-700 hover:bg-gray-600 border border-gray-600 rounded-lg disabled:opacity-50',
+                    { 'bg-cyan-700 hover:bg-cyan-600': Boolean(xrSession) },
+                  )}
+                  aria-current={Boolean(xrSession)}
+                  disabled={!xrSupported}
+                  onClick={() => {
+                    if (xrSession) {
+                      void xrSession.end();
+                    } else {
+                      requestXrSession();
+                    }
+                  }}
+                >
+                  {
+                    // eslint-disable-next-line no-nested-ternary
+                    xrSupported
+                      ? xrSession
+                        ? 'Disconnect VR'
+                        : 'Connect VR'
+                      : 'VR not supported'
                   }
-                }}
-              >
-                {
-                  // eslint-disable-next-line no-nested-ternary
-                  xrSupported
-                    ? xrSession
-                      ? 'Disconnect VR'
-                      : 'Connect VR'
-                    : 'VR not supported'
-                }
-              </button>
+                </button>
+              </div>
+              <div className="inline-flex rounded-md shadow-sm" role="group">
+                <button
+                  type="button"
+                  className={classNames(
+                    'py-2 px-4 text-sm font-medium text-white bg-gray-700 hover:bg-gray-600 border border-gray-600 rounded-l-lg',
+                    { 'bg-cyan-700 hover:bg-cyan-600': layout === 'mono' },
+                  )}
+                  aria-current={layout === 'mono'}
+                  onClick={() => setLayout('mono')}
+                >
+                  Mono
+                </button>
+                <button
+                  type="button"
+                  className={classNames(
+                    'py-2 px-4 text-sm font-medium text-white bg-gray-700 hover:bg-gray-600 border-t border-b border-gray-600',
+                    {
+                      'bg-cyan-700 hover:bg-cyan-600':
+                        layout === 'stereoLeftRight',
+                    },
+                  )}
+                  aria-current={layout === 'stereoLeftRight'}
+                  onClick={() => setLayout('stereoLeftRight')}
+                >
+                  Left | Right
+                </button>
+                <button
+                  type="button"
+                  className={classNames(
+                    'py-2 px-4 text-sm font-medium text-white bg-gray-700 hover:bg-gray-600 border border-gray-600 rounded-r-lg',
+                    {
+                      'bg-cyan-700 hover:bg-cyan-600':
+                        layout === 'stereoTopBottom',
+                    },
+                  )}
+                  aria-current={layout === 'stereoTopBottom'}
+                  onClick={() => setLayout('stereoTopBottom')}
+                >
+                  Top | Bottom
+                </button>
+              </div>
+              <div className="inline-flex rounded-md shadow-sm" role="group">
+                <button
+                  type="button"
+                  className={classNames(
+                    'py-2 px-4 text-sm font-medium text-white bg-gray-700 hover:bg-gray-600 border border-gray-600 rounded-l-lg',
+                    { 'bg-cyan-700 hover:bg-cyan-600': format === 'screen' },
+                  )}
+                  aria-current={format === 'screen'}
+                  onClick={() => setFormat('screen')}
+                >
+                  Screen
+                </button>
+                <button
+                  type="button"
+                  className={classNames(
+                    'py-2 px-4 text-sm font-medium text-white bg-gray-700 hover:bg-gray-600 border border-gray-600 rounded-r-lg',
+                    { 'bg-cyan-700 hover:bg-cyan-600': format === '180' },
+                  )}
+                  aria-current={format === '180'}
+                  onClick={() => setFormat('180')}
+                >
+                  180°
+                </button>
+              </div>
+              <div>
+                <button
+                  type="button"
+                  className={classNames(
+                    'py-2 px-4 text-sm font-medium text-white bg-gray-700 hover:bg-gray-600 border border-gray-600 rounded-lg',
+                    { 'bg-cyan-700 hover:bg-cyan-600': debug },
+                  )}
+                  aria-current={debug}
+                  onClick={() => setDebug(!debug)}
+                >
+                  Debug
+                </button>
+              </div>
             </div>
-            <div className="inline-flex rounded-md shadow-sm" role="group">
-              <button
-                type="button"
-                className={classNames(
-                  'py-2 px-4 text-sm font-medium text-white bg-gray-700 hover:bg-gray-600 border border-gray-600 rounded-l-lg',
-                  { 'bg-cyan-700 hover:bg-cyan-600': layout === 'mono' },
-                )}
-                aria-current={layout === 'mono'}
-                onClick={() => setLayout('mono')}
+            <div className="flex-1 overflow-auto py-4">
+              <video
+                hidden={!ready}
+                className={classNames('h-full mx-auto', { hidden: !ready })}
+                ref={videoRef}
+                muted
+                controls
+                loop
+              />
+              <div
+                hidden={ready}
+                className={classNames('h-full flex', { hidden: ready })}
               >
-                Mono
-              </button>
-              <button
-                type="button"
-                className={classNames(
-                  'py-2 px-4 text-sm font-medium text-white bg-gray-700 hover:bg-gray-600 border-t border-b border-gray-600',
-                  {
-                    'bg-cyan-700 hover:bg-cyan-600':
-                      layout === 'stereoLeftRight',
-                  },
-                )}
-                aria-current={layout === 'stereoLeftRight'}
-                onClick={() => setLayout('stereoLeftRight')}
-              >
-                Left | Right
-              </button>
-              <button
-                type="button"
-                className={classNames(
-                  'py-2 px-4 text-sm font-medium text-white bg-gray-700 hover:bg-gray-600 border border-gray-600 rounded-r-lg',
-                  {
-                    'bg-cyan-700 hover:bg-cyan-600':
-                      layout === 'stereoTopBottom',
-                  },
-                )}
-                aria-current={layout === 'stereoTopBottom'}
-                onClick={() => setLayout('stereoTopBottom')}
-              >
-                Top | Bottom
-              </button>
-            </div>
-            <div className="inline-flex rounded-md shadow-sm" role="group">
-              <button
-                type="button"
-                className={classNames(
-                  'py-2 px-4 text-sm font-medium text-white bg-gray-700 hover:bg-gray-600 border border-gray-600 rounded-l-lg',
-                  { 'bg-cyan-700 hover:bg-cyan-600': format === 'screen' },
-                )}
-                aria-current={format === 'screen'}
-                onClick={() => setFormat('screen')}
-              >
-                Screen
-              </button>
-              <button
-                type="button"
-                className={classNames(
-                  'py-2 px-4 text-sm font-medium text-white bg-gray-700 hover:bg-gray-600 border border-gray-600 rounded-r-lg',
-                  { 'bg-cyan-700 hover:bg-cyan-600': format === '180' },
-                )}
-                aria-current={format === '180'}
-                onClick={() => setFormat('180')}
-              >
-                180°
-              </button>
-            </div>
-            <div>
-              <button
-                type="button"
-                className={classNames(
-                  'py-2 px-4 text-sm font-medium text-white bg-gray-700 hover:bg-gray-600 border border-gray-600 rounded-lg',
-                  { 'bg-cyan-700 hover:bg-cyan-600': debug },
-                )}
-                aria-current={debug}
-                onClick={() => setDebug(!debug)}
-              >
-                Debug
-              </button>
-            </div>
-          </div>
-          <div className="flex-1 overflow-auto py-4">
-            <video
-              hidden={!ready}
-              className={classNames('h-full mx-auto', { hidden: !ready })}
-              ref={videoRef}
-              muted
-              controls
-              loop
-            />
-            <div
-              hidden={ready}
-              className={classNames('h-full flex', { hidden: ready })}
-            >
-              <span className="m-auto text-xl font-medium">
-                Just drag and drop a video file to play!
-              </span>
+                <span className="m-auto text-xl font-medium">
+                  Just drag and drop a video file to play!
+                </span>
+              </div>
             </div>
           </div>
-        </div>
+          <canvas
+            ref={canvasRef}
+            className={classNames(
+              'absolute top-0 right-0 w-[640px] h-[360px]',
+              {
+                hidden: !debug,
+              },
+            )}
+          />
+        </>
       )}
     </DropZone>
   );

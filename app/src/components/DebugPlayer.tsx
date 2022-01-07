@@ -16,15 +16,6 @@ export function DebugPlayer({
 }) {
   useEffect(() => {
     debug(video, canvas, layout, format);
-    document.body.appendChild(canvas);
-    canvas.style.position = 'absolute';
-    canvas.style.top = '0px';
-    canvas.style.right = '0px';
-    canvas.style.height = '300px';
-
-    return () => {
-      document.body.removeChild(canvas);
-    };
   }, [canvas, format, layout, video]);
 
   return <div />;
