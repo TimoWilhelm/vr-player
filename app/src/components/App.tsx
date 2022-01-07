@@ -64,12 +64,7 @@ export function App() {
   }, []);
 
   return (
-    <DropZone
-      noClick
-      multiple={false}
-      accept={['video/mp4', 'video/webm']}
-      onDrop={onFileDrop}
-    >
+    <DropZone noClick multiple={false} accept={'video/*'} onDrop={onFileDrop}>
       {({ getRootProps, getInputProps }) => (
         <>
           <div
