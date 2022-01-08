@@ -1,5 +1,8 @@
 import { BugNotification } from './BugNotification';
+import { Control } from './Control';
 import { DebugPlayer } from 'components/DebugPlayer';
+import { GroupControl } from './GroupControl';
+import { GroupControlElement } from './GroupControlElement';
 import { VrPlayer } from 'components/VrPlayer';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { useXRSession } from 'hooks/useXRSession';
@@ -89,39 +92,36 @@ export function App() {
               />
             )}
 
-            <div className="p-4 flex justify-center space-x-4">
-              <div className="rounded-lg shadow-sm">
-                <button
-                  type="button"
-                  className={classNames(
-                    'py-2 px-4 text-sm font-medium text-white bg-gray-700 hover:bg-gray-600 border border-gray-600 rounded-lg disabled:opacity-50',
-                    { 'bg-cyan-700 hover:bg-cyan-600': Boolean(xrSession) },
-                  )}
-                  aria-current={Boolean(xrSession)}
-                  disabled={!xrSupported}
-                  onClick={() => {
-                    if (xrSession) {
-                      void xrSession.end();
-                    } else {
-                      requestXrSession();
-                    }
-                  }}
-                >
-                  {
-                    // eslint-disable-next-line no-nested-ternary
-                    xrSupported
-                      ? xrSession
-                        ? 'Disconnect VR'
-                        : 'Connect VR'
-                      : 'VR not supported'
+            <div className="flex flex-wrap items-center whitespace-nowrap">
+              <Control
+                aria-current={Boolean(xrSession)}
+                disabled={!xrSupported}
+                onClick={() => {
+                  if (xrSession) {
+                    void xrSession.end();
+                  } else {
+                    requestXrSession();
                   }
-                </button>
-              </div>
-              <button
-                type="button"
-                className="py-2 px-4 text-sm font-medium text-white bg-gray-700 hover:bg-gray-600 border border-gray-600 rounded-lg shadow-sm"
+                }}
               >
-                <label htmlFor="file-input" className="cursor-pointer">
+                {
+                  // eslint-disable-next-line no-nested-ternary
+                  xrSupported
+                    ? xrSession
+                      ? 'Disconnect VR'
+                      : 'Connect VR'
+                    : 'VR not supported'
+                }
+              </Control>
+              <Control
+                onClick={(evt) => {
+                  evt.stopPropagation();
+                  document
+                    .querySelector<HTMLLabelElement>('label[for="file-input"]')
+                    ?.click();
+                }}
+              >
+                <label htmlFor="file-input" className="pointer-events-none">
                   Select file
                   <input
                     id="file-input"
@@ -129,96 +129,50 @@ export function App() {
                     {...getInputProps()}
                   />
                 </label>
-              </button>
-              <button
-                type="button"
-                className={classNames(
-                  'py-2 px-4 text-sm font-medium text-white bg-gray-700 hover:bg-gray-600 border border-gray-600 rounded-lg shadow-sm',
-                  { 'bg-cyan-700 hover:bg-cyan-600': autoplay },
-                )}
+              </Control>
+              <Control
                 aria-current={autoplay}
                 onClick={() => setAutoplay(!autoplay)}
               >
                 Autoplay
-              </button>
-              <div className="inline-flex rounded-lg shadow-sm" role="group">
-                <button
-                  type="button"
-                  className={classNames(
-                    'py-2 px-4 text-sm font-medium text-white bg-gray-700 hover:bg-gray-600 border border-gray-600 rounded-l-lg',
-                    { 'bg-cyan-700 hover:bg-cyan-600': layout === 'mono' },
-                  )}
+              </Control>
+              <GroupControl>
+                <GroupControlElement
                   aria-current={layout === 'mono'}
                   onClick={() => setLayout('mono')}
                 >
                   Mono
-                </button>
-                <button
-                  type="button"
-                  className={classNames(
-                    'py-2 px-4 text-sm font-medium text-white bg-gray-700 hover:bg-gray-600 border-t border-b border-gray-600',
-                    {
-                      'bg-cyan-700 hover:bg-cyan-600':
-                        layout === 'stereoLeftRight',
-                    },
-                  )}
+                </GroupControlElement>
+                <GroupControlElement
                   aria-current={layout === 'stereoLeftRight'}
                   onClick={() => setLayout('stereoLeftRight')}
                 >
                   Left | Right
-                </button>
-                <button
-                  type="button"
-                  className={classNames(
-                    'py-2 px-4 text-sm font-medium text-white bg-gray-700 hover:bg-gray-600 border border-gray-600 rounded-r-lg',
-                    {
-                      'bg-cyan-700 hover:bg-cyan-600':
-                        layout === 'stereoTopBottom',
-                    },
-                  )}
+                </GroupControlElement>
+                <GroupControlElement
                   aria-current={layout === 'stereoTopBottom'}
                   onClick={() => setLayout('stereoTopBottom')}
                 >
                   Top | Bottom
-                </button>
-              </div>
-              <div className="inline-flex rounded-lg shadow-sm" role="group">
-                <button
-                  type="button"
-                  className={classNames(
-                    'py-2 px-4 text-sm font-medium text-white bg-gray-700 hover:bg-gray-600 border border-gray-600 rounded-l-lg',
-                    { 'bg-cyan-700 hover:bg-cyan-600': format === 'screen' },
-                  )}
+                </GroupControlElement>
+              </GroupControl>
+              <GroupControl>
+                <GroupControlElement
                   aria-current={format === 'screen'}
                   onClick={() => setFormat('screen')}
                 >
                   Screen
-                </button>
-                <button
-                  type="button"
-                  className={classNames(
-                    'py-2 px-4 text-sm font-medium text-white bg-gray-700 hover:bg-gray-600 border border-gray-600 rounded-r-lg',
-                    { 'bg-cyan-700 hover:bg-cyan-600': format === '180' },
-                  )}
+                </GroupControlElement>
+                <GroupControlElement
                   aria-current={format === '180'}
                   onClick={() => setFormat('180')}
                 >
                   180°
-                </button>
-              </div>
-              <button
-                type="button"
-                className={classNames(
-                  'py-2 px-4 text-sm font-medium text-white bg-gray-700 hover:bg-gray-600 border border-gray-600 rounded-lg shadow-sm',
-                  { 'bg-cyan-700 hover:bg-cyan-600': debug },
-                )}
-                aria-current={debug}
-                onClick={() => setDebug(!debug)}
-              >
+                </GroupControlElement>
+              </GroupControl>
+              <Control aria-current={debug} onClick={() => setDebug(!debug)}>
                 Debug
-              </button>
-              <div role="separator" className="flex-1" />
-              <div className="text-lg font-medium m-auto">αlpha</div>
+              </Control>
             </div>
             <div className="flex-1 overflow-auto py-4">
               {/* eslint-disable-next-line jsx-a11y/media-has-caption */}
@@ -242,10 +196,13 @@ export function App() {
           </div>
           <canvas
             ref={canvasRef}
+            onClick={() => {
+              setDebug(!debug);
+            }}
             className={classNames(
               'absolute top-0 right-0 w-[640px] h-[360px]',
               {
-                hidden: !debug,
+                hidden: !debug || !ready,
               },
             )}
           />

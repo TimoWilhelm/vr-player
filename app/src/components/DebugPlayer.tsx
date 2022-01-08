@@ -20,5 +20,5 @@ export function DebugPlayer({
     void debug(video, canvas, layout, format, view);
   }, [canvas, format, layout, video, view]);
 
-  return <div />;
+  return null;
 }

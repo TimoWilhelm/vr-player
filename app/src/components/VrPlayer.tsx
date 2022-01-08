@@ -20,5 +20,5 @@ export function VrPlayer({
     void play(xrSession, video, canvas, layout, format);
   }, [canvas, format, layout, video, xrSession]);
 
-  return <div />;
+  return null;
 }
