@@ -76,8 +76,14 @@ export class VrRenderer extends Renderer {
 
       // Render each eye.
       pose.views.forEach((poseView) => {
+        const { position } = poseView.transform;
+
         const props: RenderProps = {
-          model,
+          model: mat4.translate(mat4.create(), model, [
+            position.x,
+            position.y,
+            position.z,
+          ]),
           view: poseView.transform.inverse.matrix,
           projection: poseView.projectionMatrix,
           texture: texture.subimage(textureProps),
