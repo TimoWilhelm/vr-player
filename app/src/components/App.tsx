@@ -121,7 +121,7 @@ export function App() {
                 className="py-2 px-4 text-sm font-medium text-white bg-gray-700 hover:bg-gray-600 border border-gray-600 rounded-lg shadow-sm"
               >
                 <label htmlFor="file-input" className="cursor-pointer">
-                  Upload
+                  Select file
                   <input
                     id="file-input"
                     ref={fileInputRef}
@@ -224,7 +224,7 @@ export function App() {
                 className={classNames('h-full flex', { hidden: ready })}
               >
                 <span className="m-auto text-xl font-medium">
-                  Just drag and drop a video file to play!
+                  Just drag and drop a video file anywhere to play!
                 </span>
               </div>
             </div>

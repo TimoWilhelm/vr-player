@@ -1,8 +1,11 @@
+import { XIcon } from '@heroicons/react/solid';
 import { useState } from 'react';
 import classNames from 'classnames';
 
+const isChromium = navigator.userAgent.match(/Chrome\/\d+/) !== null;
+
 export function BugNotification() {
-  const [visible, setVisible] = useState(true);
+  const [visible, setVisible] = useState(isChromium);
 
   return (
     <div
@@ -31,7 +34,7 @@ export function BugNotification() {
         }}
         className="px-2"
       >
-        🗙
+        <XIcon className="h-5 w-5" />
       </button>
     </div>
   );
