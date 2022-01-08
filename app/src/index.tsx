@@ -1,5 +1,6 @@
 import './index.css';
 import './polyfills';
+import * as serviceWorkerRegistration from './serviceWorkerRegistration';
 import { App } from 'components/App';
 import { reportWebVitals } from './reportWebVitals';
 import React from 'react';
@@ -18,5 +19,7 @@ const sendToAnalytics = ({ id, name, value }: Metric) => {
   // eslint-disable-next-line no-console
   console.log(id, name, value);
 };
+
+serviceWorkerRegistration.register();
 
 reportWebVitals(sendToAnalytics);
