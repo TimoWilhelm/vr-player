@@ -18,6 +18,7 @@ export function App() {
 
   const [file, setFile] = useState<File | undefined>();
   const [ready, setReady] = useState(false);
+  const [autoplay, setAutoplay] = useState(false);
 
   const [xrSupported, requestXrSession, xrSession] = useXRSession();
   const [debug, setDebug] = useState(false);
@@ -129,6 +130,17 @@ export function App() {
                   />
                 </label>
               </button>
+              <button
+                type="button"
+                className={classNames(
+                  'py-2 px-4 text-sm font-medium text-white bg-gray-700 hover:bg-gray-600 border border-gray-600 rounded-lg shadow-sm',
+                  { 'bg-cyan-700 hover:bg-cyan-600': autoplay },
+                )}
+                aria-current={autoplay}
+                onClick={() => setAutoplay(!autoplay)}
+              >
+                Autoplay
+              </button>
               <div className="inline-flex rounded-lg shadow-sm" role="group">
                 <button
                   type="button"
@@ -211,12 +223,11 @@ export function App() {
             <div className="flex-1 overflow-auto py-4">
               {/* eslint-disable-next-line jsx-a11y/media-has-caption */}
               <video
-                hidden={!ready}
-                className={classNames('h-full mx-auto', { hidden: !ready })}
+                // Never add the hidden attribute to the video element or the playback will be choppy
+                className={classNames('h-full mx-auto', { 'h-0': !ready })}
                 ref={videoRef}
                 controls
-                muted
-                autoPlay
+                autoPlay={autoplay}
                 loop
               />
               <div
