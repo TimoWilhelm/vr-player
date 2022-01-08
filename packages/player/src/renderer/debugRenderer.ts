@@ -12,7 +12,7 @@ export class DebugRenderer extends Renderer {
     canvas: HTMLCanvasElement,
     layout: Layout,
     format: Format,
-    private readonly view: 'left' | 'right' = 'left',
+    private readonly view: 'left' | 'right',
   ) {
     super(canvas, layout, format);
   }

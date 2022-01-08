@@ -8,15 +8,17 @@ export function DebugPlayer({
   canvas,
   layout,
   format,
+  view = 'left',
 }: {
   video: HTMLVideoElement;
   canvas: HTMLCanvasElement;
   layout: Layout;
   format: Format;
+  view?: 'left' | 'right';
 }) {
   useEffect(() => {
-    debug(video, canvas, layout, format);
-  }, [canvas, format, layout, video]);
+    void debug(video, canvas, layout, format, view);
+  }, [canvas, format, layout, video, view]);
 
   return <div />;
 }

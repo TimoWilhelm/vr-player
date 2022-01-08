@@ -17,7 +17,7 @@ export function VrPlayer({
   format: Format;
 }) {
   useEffect(() => {
-    play(xrSession, video, canvas, layout, format);
+    void play(xrSession, video, canvas, layout, format);
   }, [canvas, format, layout, video, xrSession]);
 
   return <div />;

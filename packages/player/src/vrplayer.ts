@@ -3,7 +3,7 @@ import type { Format } from './format';
 import type { Layout } from './layout';
 import type { XRSession } from 'webxr';
 
-export const play = (
+export const play = async (
   xrSession: XRSession,
   video: HTMLVideoElement,
   canvas: HTMLCanvasElement,
@@ -11,5 +11,5 @@ export const play = (
   format: Format,
 ) => {
   const renderer = new VrRenderer(xrSession, video, canvas, layout, format);
-  void renderer.start();
+  await renderer.start();
 };
