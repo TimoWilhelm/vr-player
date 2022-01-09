@@ -1,42 +1,11 @@
+import { sphere } from '../primitive';
+import { square } from '../primitive/square';
 import reglInit from 'regl';
-import sphere from 'primitive-sphere';
 import type { Format } from '../format';
 import type { Layout } from '../layout';
+import type { Primitive } from '../primitive';
 import type { Regl } from 'regl';
 import type { RenderProps } from './renderProps';
-
-function getMappedUvGlsl(format: Format) {
-  switch (format) {
-    case '180':
-      return 'mappedUv = flippedUv * vec2(2.0, 1.0) * texCoordScaleOffset.xy + texCoordScaleOffset.zw;';
-    case '360':
-    // TODO: center the texture on the screen?
-    // falls through
-    case 'screen':
-    // falls through
-    default:
-      return 'mappedUv = flippedUv * texCoordScaleOffset.xy + texCoordScaleOffset.zw;';
-  }
-}
-
-function getFragColorGlsl(format: Format) {
-  switch (format) {
-    case '180':
-      return `
-          if (behind > 0.0) {
-            gl_FragColor = vec4(0.0, 0.0, 0.0, 1.0);
-          } else {
-            gl_FragColor = texture2D(texture, mappedUv);
-          }
-        `;
-    case '360':
-    // falls through
-    case 'screen':
-    // falls through
-    default:
-      return 'gl_FragColor = texture2D(texture, mappedUv);';
-  }
-}
 
 export abstract class Renderer {
   abstract start(): Promise<void>;
@@ -63,33 +32,30 @@ export abstract class Renderer {
 
       attribute vec3 position;
       attribute vec2 uv;
+
       uniform vec4 texCoordScaleOffset;
       uniform mat4 model;
       uniform mat4 view;
       uniform mat4 projection;
 
       varying vec2 mappedUv;
-      varying float behind;
 
       void main() {
         gl_Position = projection * view * model * vec4(position, 1);
-
-        behind = position.z > 0.0 ? 1.0 : 0.0;
-
-        vec2 flippedUv = vec2(1.0 - uv.x, 1.0 - uv.y);
-        ${getMappedUvGlsl(this.format)}
-      }`,
+        mappedUv = uv * texCoordScaleOffset.xy + texCoordScaleOffset.zw;
+      }
+      `,
       frag: `
       precision highp float;
 
       uniform sampler2D texture;
 
       varying vec2 mappedUv;
-      varying float behind;
 
       void main() {
-        ${getFragColorGlsl(this.format)}
-      }`,
+        gl_FragColor = texture2D(texture, mappedUv);
+      }
+      `,
       attributes: {
         position: mesh.positions,
         uv: mesh.uvs,
@@ -105,49 +71,22 @@ export abstract class Renderer {
         ),
       },
       viewport: this.regl.prop<RenderProps, 'viewport'>('viewport'),
-      elements: mesh.cells,
+      elements: mesh.indices,
     });
   }
 
-  private getMesh(): {
-    positions: number[][];
-    cells: number[][];
-    uvs: number[][];
-    normals: number[][];
-  } {
+  private getMesh(): Primitive {
     switch (this.format) {
       case '360':
-      // falls through
+        return sphere({ radius: 1 });
       case '180': {
-        const s = sphere(1, { segments: 32 });
-        return s;
+        return sphere({ radius: 1, halfSphere: true });
       }
 
       case 'screen':
       // falls through
       default:
-        return {
-          positions: [
-            [-1, 1, 0],
-            [-1, -1, 0],
-            [1, -1, 0],
-            [1, 1, 0],
-          ],
-          cells: [
-            [0, 2, 1],
-            [0, 3, 2],
-          ],
-          uvs: [
-            [1, 1],
-            [1, 0],
-            [0, 0],
-            [0, 1],
-          ],
-          normals: [
-            [0, 0, -1],
-            [0, 0, -1],
-          ],
-        };
+        return square({ scale: 1 });
     }
   }
 

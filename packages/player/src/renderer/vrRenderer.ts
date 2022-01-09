@@ -1,6 +1,6 @@
 /* eslint-disable no-underscore-dangle */
 import { Renderer } from './renderer';
-import { mat4 } from 'gl-matrix';
+import { mat4, vec3 } from 'gl-matrix';
 import type { Format } from '../format';
 import type { Layout } from '../layout';
 import type { RenderProps } from './renderProps';
@@ -31,18 +31,27 @@ export class VrRenderer extends Renderer {
       depthNear: this.xrSession.renderState.depthNear,
     });
 
-    const textureProps: Texture2DOptions = { data: this.video };
+    const textureProps: Texture2DOptions = { data: this.video, flipY: true };
     const texture = this.regl.texture(textureProps);
     const aspectRatio = this.getAspectRation(this.video);
 
-    const screenHeight = 1;
-
     const model = mat4.create();
+    // rotate model 180 deg to flip z axis as WebXR looks towards -z
+    // https://developer.mozilla.org/en-US/docs/Web/API/WebXR_Device_API/Geometry
+    mat4.rotateY(model, model, Math.PI);
 
     if (this.format === 'screen') {
-      mat4.translate(model, model, [0, 0, -2 * screenHeight]);
+      const screenHeight = 1;
+
       // scale according to aspect ratio
       mat4.scale(model, model, [screenHeight * aspectRatio, screenHeight, 1]);
+      // move screen back a bit
+      mat4.translate(model, model, [0, 0, screenHeight]);
+    }
+
+    if (this.format === '360') {
+      // rotate model 90 deg to look at the center of the video
+      mat4.rotateY(model, model, -Math.PI / 2);
     }
 
     const offsets = this.getTexCoordScaleOffsets();
@@ -79,12 +88,12 @@ export class VrRenderer extends Renderer {
         const { position } = poseView.transform;
 
         const props: RenderProps = {
-          model: mat4.translate(mat4.create(), model, [
-            position.x,
-            position.y,
-            position.z,
-          ]),
-          view: poseView.transform.inverse.matrix,
+          model,
+          view: mat4.translate(
+            mat4.create(),
+            poseView.transform.inverse.matrix,
+            vec3.fromValues(position.x, position.y, position.z),
+          ),
           projection: poseView.projectionMatrix,
           texture: texture.subimage(textureProps),
           viewport: glLayer.getViewport(poseView),
