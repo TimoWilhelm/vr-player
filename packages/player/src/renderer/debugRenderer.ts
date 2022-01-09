@@ -44,7 +44,7 @@ export class DebugRenderer extends Renderer {
     const offset = this.view === 'left' ? offsets[0] : offsets[1];
 
     const drawLoop = () => {
-      this.regl.clear({ color: [1, 1, 1, 1], depth: 1 });
+      this.regl.clear({ color: [0, 0, 0, 1], depth: 1 });
 
       const props: RenderProps = {
         model,

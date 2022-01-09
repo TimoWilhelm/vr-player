@@ -1,1 +1,1 @@
-export type Format = 'screen' | '180';
+export type Format = 'screen' | '180' | '360';

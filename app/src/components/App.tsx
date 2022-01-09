@@ -169,6 +169,12 @@ export function App() {
                 >
                   180°
                 </GroupControlElement>
+                <GroupControlElement
+                  aria-current={format === '360'}
+                  onClick={() => setFormat('360')}
+                >
+                  360°
+                </GroupControlElement>
               </GroupControl>
               <Control aria-current={debug} onClick={() => setDebug(!debug)}>
                 Debug

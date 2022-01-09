@@ -68,7 +68,7 @@ export class VrRenderer extends Renderer {
         this.regl._gl.FRAMEBUFFER,
         glLayer.framebuffer,
       );
-      this.regl._gl.clearColor(1, 1, 1, 1);
+      this.regl._gl.clearColor(0, 0, 0, 1);
       this.regl._gl.clear(
         // eslint-disable-next-line no-bitwise
         this.regl._gl.DEPTH_BUFFER_BIT | this.regl._gl.COLOR_BUFFER_BIT,

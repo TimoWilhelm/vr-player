@@ -1,9 +1,42 @@
 import reglInit from 'regl';
-import sphere from 'primitive-icosphere';
+import sphere from 'primitive-sphere';
 import type { Format } from '../format';
 import type { Layout } from '../layout';
 import type { Regl } from 'regl';
 import type { RenderProps } from './renderProps';
+
+function getMappedUvGlsl(format: Format) {
+  switch (format) {
+    case '180':
+      return 'mappedUv = flippedUv * vec2(2.0, 1.0) * texCoordScaleOffset.xy + texCoordScaleOffset.zw;';
+    case '360':
+    // TODO: center the texture on the screen?
+    // falls through
+    case 'screen':
+    // falls through
+    default:
+      return 'mappedUv = flippedUv * texCoordScaleOffset.xy + texCoordScaleOffset.zw;';
+  }
+}
+
+function getFragColorGlsl(format: Format) {
+  switch (format) {
+    case '180':
+      return `
+          if (behind > 0.0) {
+            gl_FragColor = vec4(0.0, 0.0, 0.0, 1.0);
+          } else {
+            gl_FragColor = texture2D(texture, mappedUv);
+          }
+        `;
+    case '360':
+    // falls through
+    case 'screen':
+    // falls through
+    default:
+      return 'gl_FragColor = texture2D(texture, mappedUv);';
+  }
+}
 
 export abstract class Renderer {
   abstract start(): Promise<void>;
@@ -29,43 +62,37 @@ export abstract class Renderer {
       precision highp float;
 
       attribute vec3 position;
-      attribute vec3 normal;
+      attribute vec2 uv;
       uniform vec4 texCoordScaleOffset;
       uniform mat4 model;
       uniform mat4 view;
       uniform mat4 projection;
 
-      varying vec2 uv;
-
-      vec2 mapToScreen(vec2 position) {
-        return (position * vec2(1, -1) / 2.0 + vec2(0.5, 0.5)) * texCoordScaleOffset.xy + texCoordScaleOffset.zw;
-      }
-
-      vec2 mapToHalfCircle(vec3 normal) {
-        return vec2(0.5 + atan(normal.z, normal.x) / 6.28318531, 0.5 + asin(-normal.y) / 3.14159265) * vec2(2.0, 1.0) * texCoordScaleOffset.xy + texCoordScaleOffset.zw;
-      }
+      varying vec2 mappedUv;
+      varying float behind;
 
       void main() {
         gl_Position = projection * view * model * vec4(position, 1);
-        uv = ${
-          this.format === '180'
-            ? 'mapToHalfCircle(normal)'
-            : 'mapToScreen(position.xy)'
-        };
+
+        behind = position.z > 0.0 ? 1.0 : 0.0;
+
+        vec2 flippedUv = vec2(1.0 - uv.x, 1.0 - uv.y);
+        ${getMappedUvGlsl(this.format)}
       }`,
       frag: `
       precision highp float;
 
       uniform sampler2D texture;
 
-      varying vec2 uv;
+      varying vec2 mappedUv;
+      varying float behind;
 
       void main() {
-          gl_FragColor = texture2D(texture, uv);
+        ${getFragColorGlsl(this.format)}
       }`,
       attributes: {
         position: mesh.positions,
-        normal: mesh.normals,
+        uv: mesh.uvs,
       },
       // TODO: https://github.com/regl-project/regl/pull/632
       uniforms: {
@@ -82,12 +109,17 @@ export abstract class Renderer {
     });
   }
 
-  protected getMesh() {
+  private getMesh(): {
+    positions: number[][];
+    cells: number[][];
+    uvs: number[][];
+    normals: number[][];
+  } {
     switch (this.format) {
+      case '360':
+      // falls through
       case '180': {
-        const s = sphere(1, {
-          subdivisions: 5,
-        });
+        const s = sphere(1, { segments: 32 });
         return s;
       }
 
@@ -105,9 +137,15 @@ export abstract class Renderer {
             [0, 2, 1],
             [0, 3, 2],
           ],
+          uvs: [
+            [1, 1],
+            [1, 0],
+            [0, 0],
+            [0, 1],
+          ],
           normals: [
-            [0, 0, 1],
-            [0, 0, 1],
+            [0, 0, -1],
+            [0, 0, -1],
           ],
         };
     }
