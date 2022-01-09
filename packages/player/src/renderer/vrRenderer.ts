@@ -59,6 +59,8 @@ export class VrRenderer extends Renderer {
       'local',
     );
 
+    const view = mat4.create();
+
     const drawLoop: XRFrameRequestCallback = (
       _timestamp: number,
       xrFrame: XRFrame,
@@ -90,7 +92,7 @@ export class VrRenderer extends Renderer {
         const props: RenderProps = {
           model,
           view: mat4.translate(
-            mat4.create(),
+            view,
             poseView.transform.inverse.matrix,
             vec3.fromValues(position.x, position.y, position.z),
           ),
