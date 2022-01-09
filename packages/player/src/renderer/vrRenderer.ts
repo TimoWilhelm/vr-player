@@ -33,34 +33,15 @@ export class VrRenderer extends Renderer {
 
     const textureProps: Texture2DOptions = { data: this.video, flipY: true };
     const texture = this.regl.texture(textureProps);
-    const aspectRatio = this.getAspectRation(this.video);
 
-    const model = mat4.create();
-    // rotate model 180 deg to flip z axis as WebXR looks towards -z
-    // https://developer.mozilla.org/en-US/docs/Web/API/WebXR_Device_API/Geometry
-    mat4.rotateY(model, model, Math.PI);
+    const model = this.getModelMatrix(this.video);
 
-    if (this.format === 'screen') {
-      const screenHeight = 1;
-
-      // scale according to aspect ratio
-      mat4.scale(model, model, [screenHeight * aspectRatio, screenHeight, 1]);
-      // move screen back a bit
-      mat4.translate(model, model, [0, 0, screenHeight]);
-    }
-
-    if (this.format === '360') {
-      // rotate model 90 deg to look at the center of the video
-      mat4.rotateY(model, model, -Math.PI / 2);
-    }
+    const view = mat4.create();
 
     const offsets = this.getTexCoordScaleOffsets();
     const xrReferenceSpace = await this.xrSession.requestReferenceSpace(
       'local',
     );
-
-    const view = mat4.create();
-
     const drawLoop: XRFrameRequestCallback = (
       _timestamp: number,
       xrFrame: XRFrame,

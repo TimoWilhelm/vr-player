@@ -1,3 +1,4 @@
+import { mat4 } from 'gl-matrix';
 import { sphere } from '../primitive';
 import { square } from '../primitive/square';
 import reglInit from 'regl';
@@ -82,12 +83,49 @@ export abstract class Renderer {
       case '180': {
         return sphere({ radius: 1, halfSphere: true });
       }
-
       case 'screen':
       // falls through
       default:
         return square({ scale: 1 });
     }
+  }
+
+  private getAspectRation(video: HTMLVideoElement) {
+    switch (this.layout) {
+      case 'stereoTopBottom':
+        return (video.videoWidth / video.videoHeight) * 0.5;
+      case 'stereoLeftRight':
+        return (video.videoWidth * 0.5) / video.videoHeight;
+      case 'mono':
+      // falls through
+      default:
+        return video.videoWidth / video.videoHeight;
+    }
+  }
+
+  protected getModelMatrix(video: HTMLVideoElement) {
+    const aspectRatio = this.getAspectRation(video);
+
+    const model = mat4.create();
+    // rotate model 180 deg to flip z axis as WebXR looks towards -z
+    // https://developer.mozilla.org/en-US/docs/Web/API/WebXR_Device_API/Geometry
+    mat4.rotateY(model, model, Math.PI);
+
+    if (this.format === 'screen') {
+      const screenHeight = 1;
+
+      // scale according to aspect ratio
+      mat4.scale(model, model, [screenHeight * aspectRatio, screenHeight, 1]);
+      // move screen back a bit
+      mat4.translate(model, model, [0, 0, screenHeight]);
+    }
+
+    if (this.format === '360') {
+      // rotate model 90 deg to look at the center of the video
+      mat4.rotateY(model, model, -Math.PI / 2);
+    }
+
+    return model;
   }
 
   protected getTexCoordScaleOffsets() {
@@ -109,19 +147,6 @@ export abstract class Renderer {
           new Float32Array([1.0, 1.0, 0.0, 0.0]),
           new Float32Array([1.0, 1.0, 0.0, 0.0]),
         ];
-    }
-  }
-
-  protected getAspectRation(video: HTMLVideoElement) {
-    switch (this.layout) {
-      case 'stereoTopBottom':
-        return (video.videoWidth / video.videoHeight) * 0.5;
-      case 'stereoLeftRight':
-        return (video.videoWidth * 0.5) / video.videoHeight;
-      case 'mono':
-      // falls through
-      default:
-        return video.videoWidth / video.videoHeight;
     }
   }
 }
