@@ -73,15 +73,19 @@ export abstract class Renderer {
       },
       viewport: this.regl.prop<RenderProps, 'viewport'>('viewport'),
       elements: mesh.indices,
+      cull: {
+        enable: true,
+        face: 'front',
+      },
     });
   }
 
   private getMesh(): Primitive {
     switch (this.format) {
       case '360':
-        return sphere({ radius: 1 });
+        return sphere({ radius: 1, segments: 32 });
       case '180': {
-        return sphere({ radius: 1, halfSphere: true });
+        return sphere({ radius: 1, segments: 16, halfSphere: true });
       }
       case 'screen':
       // falls through

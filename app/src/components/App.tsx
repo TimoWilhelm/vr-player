@@ -183,9 +183,9 @@ export function App() {
             <div className="flex-1 overflow-auto py-4">
               {/* eslint-disable-next-line jsx-a11y/media-has-caption */}
               <video
-                // Never add the hidden attribute to the video element or the playback will be choppy
                 className={classNames('h-full mx-auto', { 'h-0': !ready })}
                 ref={videoRef}
+                preload="auto"
                 controls
                 autoPlay={autoplay}
                 loop

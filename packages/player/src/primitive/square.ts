@@ -10,8 +10,8 @@ export function square({ scale = 1 }): Primitive {
       vec3.scale(vec3.create(), [1, 1, 0], scale),
     ],
     indices: [
-      [0, 2, 1],
-      [0, 3, 2],
+      [0, 1, 2],
+      [0, 2, 3],
     ],
     uvs: [
       [1, 1],
