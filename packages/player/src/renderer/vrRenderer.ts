@@ -43,7 +43,7 @@ export class VrRenderer extends Renderer {
       'local',
     );
     const drawLoop: XRFrameRequestCallback = (
-      _timestamp: number,
+      _time: DOMHighResTimeStamp,
       xrFrame: XRFrame,
     ) => {
       const glLayer = this.xrSession.renderState.baseLayer;
