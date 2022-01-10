@@ -1,5 +1,5 @@
 /* eslint-disable no-param-reassign */
-import { debug } from '@vr-viewer/player';
+import { DebugRenderer } from '@vr-viewer/player';
 import { useEffect } from 'react';
 import type { Format, Layout } from '@vr-viewer/player';
 
@@ -17,7 +17,9 @@ export function DebugPlayer({
   view?: 'left' | 'right';
 }) {
   useEffect(() => {
-    void debug(video, canvas, layout, format, view);
+    const renderer = new DebugRenderer(video, canvas, layout, format, view);
+    void renderer.start();
+    return () => renderer.stop();
   }, [canvas, format, layout, video, view]);
 
   return null;

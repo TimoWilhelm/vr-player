@@ -11,6 +11,10 @@ import type { RenderProps } from './renderProps';
 export abstract class Renderer {
   abstract start(): Promise<void>;
 
+  public stop() {
+    this.regl.destroy();
+  }
+
   protected readonly regl: Regl;
 
   protected readonly cmdRender: reglInit.DrawCommand<

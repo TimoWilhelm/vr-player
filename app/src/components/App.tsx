@@ -45,6 +45,7 @@ export function App() {
 
   useEffect(() => {
     let objectUrl = '';
+
     if (file && videoRef.current) {
       objectUrl = URL.createObjectURL(file);
       videoRef.current.src = objectUrl;

@@ -1,4 +1,4 @@
-import { play } from '@vr-viewer/player';
+import { VrRenderer } from '@vr-viewer/player';
 import { useEffect } from 'react';
 import type { Format, Layout } from '@vr-viewer/player';
 import type { XRSession } from 'webxr';
@@ -17,7 +17,9 @@ export function VrPlayer({
   format: Format;
 }) {
   useEffect(() => {
-    void play(xrSession, video, canvas, layout, format);
+    const renderer = new VrRenderer(xrSession, video, canvas, layout, format);
+    void renderer.start();
+    return () => renderer.stop();
   }, [canvas, format, layout, video, xrSession]);
 
   return null;
