@@ -4,6 +4,7 @@ import { DebugPlayer } from 'components/DebugPlayer';
 import { GroupControl } from './GroupControl';
 import { GroupControlElement } from './GroupControlElement';
 import { VrPlayer } from 'components/VrPlayer';
+import { recognizeVideo } from 'helper/videoRecognition';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { useXRSession } from 'hooks/useXRSession';
 import DropZone from 'react-dropzone';
@@ -22,6 +23,8 @@ export function App() {
   const [file, setFile] = useState<File | undefined>();
   const [ready, setReady] = useState(false);
   const [autoplay, setAutoplay] = useState(false);
+  const [autoDetect, setAutoDetect] = useState(true);
+  const [detecting, setDetecting] = useState(false);
 
   const [xrSupported, requestXrSession, xrSession] = useXRSession();
   const [debug, setDebug] = useState(false);
@@ -41,7 +44,20 @@ export function App() {
     return () => {
       video?.removeEventListener('loadeddata', onLoadeddata);
     };
-  }, [videoRef]);
+  }, []);
+
+  useEffect(() => {
+    if (autoDetect && ready && videoRef.current) {
+      setDetecting(true);
+      void recognizeVideo(videoRef.current).then(
+        ([detectedFormat, detectedLayout]) => {
+          if (detectedFormat) setFormat(detectedFormat);
+          if (detectedLayout) setLayout(detectedLayout);
+          setDetecting(false);
+        },
+      );
+    }
+  }, [autoDetect, ready]);
 
   useEffect(() => {
     let objectUrl = '';
@@ -137,6 +153,21 @@ export function App() {
               >
                 Autoplay
               </Control>
+              <div className="flex relative">
+                {detecting && (
+                  <>
+                    <div className="absolute top-1 right-1 rounded-full h-3 w-3 text-cyan-500 bg-white shadow-lg" />
+                    <div className="absolute top-1 right-1 rounded-full h-3 w-3 bg-white animate-ping" />
+                  </>
+                )}
+                <Control
+                  aria-current={autoDetect}
+                  onClick={() => setAutoDetect(!autoDetect)}
+                >
+                  Detect settings
+                </Control>
+              </div>
+
               <GroupControl>
                 <GroupControlElement
                   aria-current={layout === 'mono'}
