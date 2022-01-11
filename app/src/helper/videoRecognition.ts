@@ -177,9 +177,13 @@ async function getImageFrames(video: HTMLVideoElement): Promise<ImageData[]> {
     video.duration * 0.2,
     video.duration * 0.8,
     numberOfFrames + 2,
-  ).slice(1, -1);
+  )
+    .map((n) => Math.floor(n))
+    .slice(1, -1);
 
   const videoClone = video.cloneNode(false) as HTMLVideoElement;
+  videoClone.muted = true;
+  videoClone.pause();
 
   const promises = timeStamps.map((timeStamp) => {
     return new Promise<ImageData>((resolve) => {
@@ -200,8 +204,11 @@ async function getImageFrames(video: HTMLVideoElement): Promise<ImageData[]> {
 
 export async function recognizeVideo(
   video: HTMLVideoElement,
-): Promise<[Format?, Layout?]> {
+): Promise<[Layout?, Format?]> {
   const imageFrames = await getImageFrames(video);
 
-  return [detectFormat(imageFrames), detectLayout(imageFrames)];
+  const layout = detectLayout(imageFrames);
+  const format = detectFormat(imageFrames);
+
+  return [layout, format];
 }

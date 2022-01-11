@@ -19,7 +19,9 @@ export function VrPlayer({
   useEffect(() => {
     const renderer = new VrRenderer(xrSession, video, canvas, layout, format);
     void renderer.start();
-    return () => renderer.stop();
+    return () => {
+      renderer.stop();
+    };
   }, [canvas, format, layout, video, xrSession]);
 
   return null;

@@ -8,6 +8,8 @@ import type { Texture2DOptions } from 'regl';
 import type { XRFrame, XRFrameRequestCallback, XRSession } from 'webxr';
 
 export class VrRenderer extends Renderer {
+  private raf = 0;
+
   constructor(
     private readonly xrSession: XRSession,
     private readonly video: HTMLVideoElement,
@@ -18,7 +20,11 @@ export class VrRenderer extends Renderer {
     super(canvas, layout, format);
   }
 
-  async start(): Promise<void> {
+  protected stopDrawLoop(): void {
+    window.cancelAnimationFrame(this.raf);
+  }
+
+  protected async startDrawLoop(): Promise<void> {
     // **** First hack to get this to work with regl:
     // @ts-expect-error unstable API
     // eslint-disable-next-line @typescript-eslint/no-unsafe-call
@@ -42,6 +48,7 @@ export class VrRenderer extends Renderer {
     const xrReferenceSpace = await this.xrSession.requestReferenceSpace(
       'local',
     );
+
     const drawLoop: XRFrameRequestCallback = (
       _time: DOMHighResTimeStamp,
       xrFrame: XRFrame,
@@ -86,9 +93,9 @@ export class VrRenderer extends Renderer {
         this.cmdRender(props);
       });
 
-      this.xrSession.requestAnimationFrame(drawLoop);
+      this.raf = this.xrSession.requestAnimationFrame(drawLoop);
     };
 
-    this.xrSession.requestAnimationFrame(drawLoop);
+    this.raf = this.xrSession.requestAnimationFrame(drawLoop);
   }
 }

@@ -50,9 +50,9 @@ export function App() {
     if (autoDetect && ready && videoRef.current) {
       setDetecting(true);
       void recognizeVideo(videoRef.current).then(
-        ([detectedFormat, detectedLayout]) => {
-          if (detectedFormat) setFormat(detectedFormat);
+        ([detectedLayout, detectedFormat]) => {
           if (detectedLayout) setLayout(detectedLayout);
+          if (detectedFormat) setFormat(detectedFormat);
           setDetecting(false);
         },
       );

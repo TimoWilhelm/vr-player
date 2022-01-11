@@ -9,9 +9,15 @@ import type { Regl } from 'regl';
 import type { RenderProps } from './renderProps';
 
 export abstract class Renderer {
-  abstract start(): Promise<void>;
+  protected abstract startDrawLoop(): Promise<void>;
+  protected abstract stopDrawLoop(): void;
+
+  public async start() {
+    await this.startDrawLoop();
+  }
 
   public stop() {
+    this.stopDrawLoop();
     this.regl.destroy();
   }
 

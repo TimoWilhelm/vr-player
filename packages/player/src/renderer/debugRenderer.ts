@@ -7,6 +7,8 @@ import type { RenderProps } from './renderProps';
 import type { Texture2DOptions } from 'regl';
 
 export class DebugRenderer extends Renderer {
+  private raf = 0;
+
   constructor(
     private readonly video: HTMLVideoElement,
     canvas: HTMLCanvasElement,
@@ -17,7 +19,11 @@ export class DebugRenderer extends Renderer {
     super(canvas, layout, format);
   }
 
-  start(): Promise<void> {
+  protected stopDrawLoop(): void {
+    window.cancelAnimationFrame(this.raf);
+  }
+
+  protected async startDrawLoop(): Promise<void> {
     const textureProps: Texture2DOptions = { data: this.video, flipY: true };
     const texture = this.regl.texture(textureProps);
 
@@ -54,10 +60,10 @@ export class DebugRenderer extends Renderer {
       };
       this.cmdRender(props);
 
-      window.requestAnimationFrame(drawLoop);
+      this.raf = window.requestAnimationFrame(drawLoop);
     };
 
-    window.requestAnimationFrame(drawLoop);
+    this.raf = window.requestAnimationFrame(drawLoop);
 
     return Promise.resolve();
   }

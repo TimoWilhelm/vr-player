@@ -19,7 +19,9 @@ export function DebugPlayer({
   useEffect(() => {
     const renderer = new DebugRenderer(video, canvas, layout, format, view);
     void renderer.start();
-    return () => renderer.stop();
+    return () => {
+      renderer.stop();
+    };
   }, [canvas, format, layout, video, view]);
 
   return null;
