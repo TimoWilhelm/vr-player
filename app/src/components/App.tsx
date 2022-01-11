@@ -155,10 +155,20 @@ export function App() {
               </Control>
               <div className="flex relative">
                 {detecting && (
-                  <>
-                    <div className="absolute top-1 right-1 rounded-full h-3 w-3 text-cyan-500 bg-white shadow-lg" />
-                    <div className="absolute top-1 right-1 rounded-full h-3 w-3 bg-white animate-ping" />
-                  </>
+                  <span
+                    className="absolute top-1 right-1 h-3 w-3"
+                    role="status"
+                  >
+                    <span className="sr-only">Loading...</span>
+                    <span
+                      role="presentation"
+                      className="absolute h-full w-full rounded-full bg-white shadow-sm"
+                    />
+                    <span
+                      role="presentation"
+                      className="animate-ping absolute h-full w-full rounded-full bg-white"
+                    />
+                  </span>
                 )}
                 <Control
                   aria-current={autoDetect}
