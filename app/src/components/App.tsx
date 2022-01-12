@@ -125,28 +125,22 @@ export function App() {
                   // eslint-disable-next-line no-nested-ternary
                   xrSupported
                     ? xrSession
-                      ? 'Disconnect VR'
-                      : 'Connect VR'
+                      ? 'Enter VR'
+                      : 'Exit VR'
                     : 'VR not supported'
                 }
               </Control>
-              <Control
-                onClick={(evt) => {
-                  evt.stopPropagation();
-                  document
-                    .querySelector<HTMLLabelElement>('label[for="file-input"]')
-                    ?.click();
-                }}
+              <label
+                htmlFor="file-input"
+                className="cursor-pointer flex m-2 py-2 px-4 text-sm font-medium text-white bg-gray-700 hover:bg-gray-600 border border-gray-600 rounded-lg shadow-sm"
               >
-                <label htmlFor="file-input" className="pointer-events-none">
-                  Select file
-                  <input
-                    id="file-input"
-                    ref={fileInputRef}
-                    {...getInputProps()}
-                  />
-                </label>
-              </Control>
+                Select file
+                <input
+                  id="file-input"
+                  ref={fileInputRef}
+                  {...getInputProps()}
+                />
+              </label>
               <Control
                 aria-current={autoplay}
                 onClick={() => setAutoplay(!autoplay)}
@@ -234,9 +228,12 @@ export function App() {
               />
               <div
                 hidden={ready}
-                className={classNames('h-full flex', { hidden: ready })}
+                className={classNames(
+                  'h-full flex justify-center items-center',
+                  { hidden: ready },
+                )}
               >
-                <span className="m-auto text-xl font-medium">
+                <span className="p-8 text-xl font-medium">
                   Just drag and drop a video file anywhere to play!
                 </span>
               </div>
