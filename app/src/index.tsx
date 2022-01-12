@@ -20,6 +20,16 @@ const sendToAnalytics = ({ id, name, value }: Metric) => {
   console.log(id, name, value);
 };
 
-serviceWorkerRegistration.register();
+serviceWorkerRegistration.register({
+  onUpdate: (e) => {
+    if (e.waiting) {
+      e.waiting.postMessage({ type: 'SKIP_WAITING' });
+    }
+
+    void e.update().then(() => {
+      window.location.reload();
+    });
+  },
+});
 
 reportWebVitals(sendToAnalytics);
