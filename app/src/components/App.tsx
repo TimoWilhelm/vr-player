@@ -109,7 +109,10 @@ export function App() {
               />
             )}
 
-            <div className="flex flex-wrap items-center whitespace-nowrap">
+            <div
+              data-nosnippet
+              className="flex flex-wrap items-center whitespace-nowrap"
+            >
               <Control
                 aria-current={Boolean(xrSession)}
                 disabled={!xrSupported}
