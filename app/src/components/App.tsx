@@ -125,8 +125,8 @@ export function App() {
                   // eslint-disable-next-line no-nested-ternary
                   xrSupported
                     ? xrSession
-                      ? 'Enter VR'
-                      : 'Exit VR'
+                      ? 'Exit VR'
+                      : 'Enter VR'
                     : 'VR not supported'
                 }
               </Control>
@@ -219,7 +219,9 @@ export function App() {
             <div className="flex-1 overflow-auto py-4">
               {/* eslint-disable-next-line jsx-a11y/media-has-caption */}
               <video
-                className={classNames('h-full mx-auto', { 'h-0': !ready })}
+                className={classNames('h-full mx-auto shadow-sm', {
+                  'h-0': !ready,
+                })}
                 ref={videoRef}
                 preload="auto"
                 controls
