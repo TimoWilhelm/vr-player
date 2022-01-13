@@ -12,12 +12,11 @@ import {
 } from 'atoms/controls';
 import { getImageFrames } from 'helper/getImageFrames';
 import { useAtom } from 'jotai';
-import { useCallback, useEffect, useRef, useState } from 'react';
 import { useDropzone } from 'react-dropzone';
+import { useEffect, useRef, useState } from 'react';
 import { useXRSession } from 'hooks/useXRSession';
 import { wrap } from 'comlink';
 import classNames from 'classnames';
-import type { DropEvent, FileRejection } from 'react-dropzone';
 import type { VideoRecognitionWorkerType } from 'worker/videoRecognition.worker';
 
 const recognizeVideo = wrap<VideoRecognitionWorkerType>(
@@ -44,59 +43,43 @@ export function App() {
   const [, setDetecting] = useAtom(detectingAtom);
 
   useEffect(() => {
-    if (autoDetect && ready && videoRef.current) {
+    if (ready && videoRef.current && autoDetect) {
       setDetecting(true);
 
       void (async (video) => {
         const frames = await getImageFrames(video);
         const [detectedLayout, detectedFormat] = await recognizeVideo(frames);
+
         if (detectedLayout) setLayout(detectedLayout);
         if (detectedFormat) setFormat(detectedFormat);
+
         setDetecting(false);
       })(videoRef.current);
     }
   }, [autoDetect, ready, setDetecting, setFormat, setLayout]);
 
   useEffect(() => {
-    const video = videoRef.current;
-
-    const onLoadeddata = () => {
-      setReady(true);
-    };
-
-    video?.addEventListener('loadeddata', onLoadeddata);
-    return () => {
-      video?.removeEventListener('loadeddata', onLoadeddata);
-    };
-  }, [setReady]);
-
-  useEffect(() => {
     let objectUrl = '';
 
     if (file && videoRef.current) {
-      objectUrl = URL.createObjectURL(file);
-
       setReady(false);
+
+      objectUrl = URL.createObjectURL(file);
       videoRef.current.src = objectUrl;
     }
+
     return () => {
       URL.revokeObjectURL(objectUrl);
     };
   }, [file, setReady]);
 
-  const onFileDrop: <T extends File>(
-    acceptedFiles: T[],
-    fileRejections: FileRejection[],
-    event: DropEvent,
-  ) => void = useCallback((acceptedFiles) => {
-    setFile(acceptedFiles[0]);
-  }, []);
-
   const { getRootProps, getInputProps } = useDropzone({
     noClick: true,
     multiple: false,
     accept: 'video/*',
-    onDrop: onFileDrop,
+    onDrop: (acceptedFiles) => {
+      setFile(acceptedFiles[0]);
+    },
   });
 
   return (
@@ -136,6 +119,7 @@ export function App() {
           controls
           autoPlay={autoPlay}
           loop
+          onLoadedData={() => setReady(true)}
         />
         <div
           hidden={ready}
