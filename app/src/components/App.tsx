@@ -10,13 +10,19 @@ import {
   formatAtom,
   layoutAtom,
 } from 'atoms/controls';
-import { recognizeVideo } from 'helper/videoRecognition';
+import { getImageFrames } from 'helper/getImageFrames';
 import { useAtom } from 'jotai';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { useDropzone } from 'react-dropzone';
+import { wrap } from 'comlink';
 import { xrSessionAtom } from 'atoms/xr';
 import classNames from 'classnames';
 import type { DropEvent, FileRejection } from 'react-dropzone';
+import type { VideoRecognitionWorkerType } from 'worker/videoRecognition.worker';
+
+const recognizeVideo = wrap<VideoRecognitionWorkerType>(
+  new Worker(new URL('worker/videoRecognition.worker', import.meta.url)),
+);
 
 export function App() {
   const videoRef = useRef<HTMLVideoElement>(null);
@@ -40,13 +46,14 @@ export function App() {
   useEffect(() => {
     if (autoDetect && ready && videoRef.current) {
       setDetecting(true);
-      void recognizeVideo(videoRef.current).then(
-        ([detectedLayout, detectedFormat]) => {
-          if (detectedLayout) setLayout(detectedLayout);
-          if (detectedFormat) setFormat(detectedFormat);
-          setDetecting(false);
-        },
-      );
+
+      void (async (video) => {
+        const frames = await getImageFrames(video);
+        const [detectedLayout, detectedFormat] = await recognizeVideo(frames);
+        if (detectedLayout) setLayout(detectedLayout);
+        if (detectedFormat) setFormat(detectedFormat);
+        setDetecting(false);
+      })(videoRef.current);
     }
   }, [autoDetect, ready, setDetecting, setFormat, setLayout]);
 

@@ -1,30 +1,5 @@
+import { linSpace, nWise } from 'helper/util';
 import type { Format, Layout } from '@vr-viewer/player';
-
-function* nWise<T>(n: number, iterable: Iterable<T>): Generator<Array<T>> {
-  const iterator = iterable[Symbol.iterator]();
-  let current = iterator.next();
-
-  let tmp = [];
-
-  while (!current.done) {
-    tmp.push(current.value);
-    if (tmp.length === n) {
-      yield tmp;
-      tmp = [];
-    }
-
-    current = iterator.next();
-  }
-}
-
-function linSpace(startValue: number, stopValue: number, cardinality: number) {
-  const arr = [];
-  const step = (stopValue - startValue) / (cardinality - 1);
-  for (let i = 0; i < cardinality; i += 1) {
-    arr.push(startValue + step * i);
-  }
-  return arr;
-}
 
 function getPixelDiff(a: number[][], b: number[][]) {
   const diffs = a.map((pixel, index) => {
@@ -158,57 +133,4 @@ export function detectFormat(frames: ImageData[]): Format {
   }
 
   return 'screen';
-}
-
-async function getImageFrames(video: HTMLVideoElement): Promise<ImageData[]> {
-  const canvas = document.createElement('canvas');
-  const ctx = canvas.getContext('2d');
-
-  if (!ctx) {
-    return [];
-  }
-
-  canvas.width = video.videoWidth;
-  canvas.height = video.videoHeight;
-
-  const numberOfFrames = 5;
-
-  const timeStamps = linSpace(
-    video.duration * 0.2,
-    video.duration * 0.8,
-    numberOfFrames + 2,
-  )
-    .map((n) => Math.floor(n))
-    .slice(1, -1);
-
-  const videoClone = video.cloneNode(false) as HTMLVideoElement;
-  videoClone.muted = true;
-  videoClone.pause();
-
-  const promises = timeStamps.map((timeStamp) => {
-    return new Promise<ImageData>((resolve) => {
-      const onSeeked = () => {
-        videoClone.removeEventListener('seeked', onSeeked);
-        ctx.drawImage(videoClone, 0, 0);
-        resolve(ctx.getImageData(0, 0, canvas.width, canvas.height));
-      };
-
-      videoClone.addEventListener('seeked', onSeeked);
-      videoClone.currentTime = timeStamp;
-    });
-  });
-
-  const frames = await Promise.all(promises);
-  return frames;
-}
-
-export async function recognizeVideo(
-  video: HTMLVideoElement,
-): Promise<[Layout?, Format?]> {
-  const imageFrames = await getImageFrames(video);
-
-  const layout = detectLayout(imageFrames);
-  const format = detectFormat(imageFrames);
-
-  return [layout, format];
 }

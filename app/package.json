@@ -16,6 +16,7 @@
     "@vr-viewer/player": "*",
     "autoprefixer": "^10.4.1",
     "classnames": "^2.3.1",
+    "comlink": "^4.3.1",
     "eslint-config-airbnb": "^19.0.4",
     "jest-canvas-mock": "^2.3.1",
     "jotai": "^1.5.2",
