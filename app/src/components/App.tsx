@@ -14,8 +14,8 @@ import { getImageFrames } from 'helper/getImageFrames';
 import { useAtom } from 'jotai';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { useDropzone } from 'react-dropzone';
+import { useXRSession } from 'hooks/useXRSession';
 import { wrap } from 'comlink';
-import { xrSessionAtom } from 'atoms/xr';
 import classNames from 'classnames';
 import type { DropEvent, FileRejection } from 'react-dropzone';
 import type { VideoRecognitionWorkerType } from 'worker/videoRecognition.worker';
@@ -36,10 +36,10 @@ export function App() {
   const [autoPlay] = useAtom(autoPlayAtom);
   const [autoDetect] = useAtom(autoDetectAtom);
 
-  const [xrSession] = useAtom(xrSessionAtom);
-
-  const [file, setFile] = useState<File | undefined>();
+  const [file, setFile] = useState<File | null>(null);
   const [ready, setReady] = useState(false);
+
+  const [, xrSession] = useXRSession();
 
   const [, setDetecting] = useAtom(detectingAtom);
 
@@ -61,8 +61,6 @@ export function App() {
     const video = videoRef.current;
 
     const onLoadeddata = () => {
-      if (!video) return;
-
       setReady(true);
     };
 

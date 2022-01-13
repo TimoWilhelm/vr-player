@@ -1,7 +1,9 @@
-import { useAtom } from 'jotai';
+import { atom, useAtom } from 'jotai';
 import { useCallback, useEffect } from 'react';
-import { xrSessionAtom, xrSupportedAtom } from 'atoms/xr';
 import type { XRSession } from 'webxr';
+
+const xrSupportedAtom = atom(false);
+const xrSessionAtom = atom<XRSession | null>(null);
 
 function checkForXRSupport() {
   if (!navigator.xr) {
