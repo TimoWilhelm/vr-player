@@ -1,50 +1,41 @@
 import { BugNotification } from './BugNotification';
-import { Control } from './Control';
 import { DebugPlayer } from 'components/DebugPlayer';
-import { GroupControl } from './GroupControl';
-import { GroupControlElement } from './GroupControlElement';
+import { UI } from './ui/UI';
 import { VrPlayer } from 'components/VrPlayer';
+import {
+  autoDetectAtom,
+  autoPlayAtom,
+  debugAtom,
+  detectingAtom,
+  formatAtom,
+  layoutAtom,
+} from 'atoms/controls';
 import { recognizeVideo } from 'helper/videoRecognition';
+import { useAtom } from 'jotai';
 import { useCallback, useEffect, useRef, useState } from 'react';
-import { useXRSession } from 'hooks/useXRSession';
-import DropZone from 'react-dropzone';
+import { useDropzone } from 'react-dropzone';
+import { xrSessionAtom } from 'atoms/xr';
 import classNames from 'classnames';
 import type { DropEvent, FileRejection } from 'react-dropzone';
-import type { Format, Layout } from '@vr-viewer/player';
 
 export function App() {
   const videoRef = useRef<HTMLVideoElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
-  const fileInputRef = useRef<HTMLInputElement>(null);
 
-  const [layout, setLayout] = useState<Layout>('stereoLeftRight');
-  const [format, setFormat] = useState<Format>('180');
+  const [layout, setLayout] = useAtom(layoutAtom);
+  const [format, setFormat] = useAtom(formatAtom);
+
+  const [debug, setDebug] = useAtom(debugAtom);
+
+  const [autoPlay] = useAtom(autoPlayAtom);
+  const [autoDetect] = useAtom(autoDetectAtom);
+
+  const [xrSession] = useAtom(xrSessionAtom);
 
   const [file, setFile] = useState<File | undefined>();
   const [ready, setReady] = useState(false);
-  const [autoplay, setAutoplay] = useState(false);
-  const [autoDetect, setAutoDetect] = useState(true);
-  const [detecting, setDetecting] = useState(false);
 
-  const [xrSupported, requestXrSession, xrSession] = useXRSession();
-  const [debug, setDebug] = useState(false);
-
-  useEffect(() => {
-    const video = videoRef.current;
-
-    const onLoadeddata = () => {
-      if (!video) return;
-
-      setTimeout(() => {
-        setReady(true);
-      }, 10);
-    };
-
-    video?.addEventListener('loadeddata', onLoadeddata);
-    return () => {
-      video?.removeEventListener('loadeddata', onLoadeddata);
-    };
-  }, []);
+  const [, setDetecting] = useAtom(detectingAtom);
 
   useEffect(() => {
     if (autoDetect && ready && videoRef.current) {
@@ -57,21 +48,36 @@ export function App() {
         },
       );
     }
-  }, [autoDetect, ready]);
+  }, [autoDetect, ready, setDetecting, setFormat, setLayout]);
+
+  useEffect(() => {
+    const video = videoRef.current;
+
+    const onLoadeddata = () => {
+      if (!video) return;
+
+      setReady(true);
+    };
+
+    video?.addEventListener('loadeddata', onLoadeddata);
+    return () => {
+      video?.removeEventListener('loadeddata', onLoadeddata);
+    };
+  }, [setReady]);
 
   useEffect(() => {
     let objectUrl = '';
 
     if (file && videoRef.current) {
       objectUrl = URL.createObjectURL(file);
-      videoRef.current.src = objectUrl;
 
       setReady(false);
+      videoRef.current.src = objectUrl;
     }
     return () => {
       URL.revokeObjectURL(objectUrl);
     };
-  }, [file, requestXrSession]);
+  }, [file, setReady]);
 
   const onFileDrop: <T extends File>(
     acceptedFiles: T[],
@@ -81,183 +87,71 @@ export function App() {
     setFile(acceptedFiles[0]);
   }, []);
 
+  const { getRootProps, getInputProps } = useDropzone({
+    noClick: true,
+    multiple: false,
+    accept: 'video/*',
+    onDrop: onFileDrop,
+  });
+
   return (
-    <DropZone noClick multiple={false} accept={'video/*'} onDrop={onFileDrop}>
-      {({ getRootProps, getInputProps }) => (
-        <>
-          <div
-            className="h-full flex flex-col bg-gray-900 text-white"
-            {...getRootProps()}
-          >
-            <BugNotification />
+    <div
+      className="h-full flex flex-col bg-gray-900 text-white"
+      {...getRootProps()}
+    >
+      <BugNotification />
 
-            {videoRef.current && canvasRef.current && ready && debug && (
-              <DebugPlayer
-                video={videoRef.current}
-                canvas={canvasRef.current}
-                layout={layout}
-                format={format}
-              />
-            )}
-            {videoRef.current && canvasRef.current && ready && xrSession && (
-              <VrPlayer
-                xrSession={xrSession}
-                video={videoRef.current}
-                canvas={canvasRef.current}
-                layout={layout}
-                format={format}
-              />
-            )}
-
-            <div
-              data-nosnippet
-              className="flex flex-wrap items-center whitespace-nowrap"
-            >
-              <Control
-                aria-current={Boolean(xrSession)}
-                disabled={!xrSupported}
-                onClick={() => {
-                  if (xrSession) {
-                    void xrSession.end();
-                  } else {
-                    requestXrSession();
-                  }
-                }}
-              >
-                {
-                  // eslint-disable-next-line no-nested-ternary
-                  xrSupported
-                    ? xrSession
-                      ? 'Exit VR'
-                      : 'Enter VR'
-                    : 'VR not supported'
-                }
-              </Control>
-              <label
-                htmlFor="file-input"
-                className="cursor-pointer flex m-2 py-2 px-4 text-sm font-medium text-white bg-gray-700 hover:bg-gray-600 border border-gray-600 rounded-lg shadow-sm"
-              >
-                Select file
-                <input
-                  id="file-input"
-                  ref={fileInputRef}
-                  {...getInputProps()}
-                />
-              </label>
-              <Control
-                aria-current={autoplay}
-                onClick={() => setAutoplay(!autoplay)}
-              >
-                Autoplay
-              </Control>
-              <div className="flex relative">
-                {detecting && (
-                  <span
-                    className="absolute top-1 right-1 h-3 w-3"
-                    role="status"
-                  >
-                    <span className="sr-only">Loading...</span>
-                    <span
-                      role="presentation"
-                      className="absolute h-full w-full rounded-full bg-white shadow-sm"
-                    />
-                    <span
-                      role="presentation"
-                      className="animate-ping absolute h-full w-full rounded-full bg-white"
-                    />
-                  </span>
-                )}
-                <Control
-                  aria-current={autoDetect}
-                  onClick={() => setAutoDetect(!autoDetect)}
-                >
-                  Detect settings
-                </Control>
-              </div>
-
-              <GroupControl>
-                <GroupControlElement
-                  aria-current={layout === 'mono'}
-                  onClick={() => setLayout('mono')}
-                >
-                  Mono
-                </GroupControlElement>
-                <GroupControlElement
-                  aria-current={layout === 'stereoLeftRight'}
-                  onClick={() => setLayout('stereoLeftRight')}
-                >
-                  Left | Right
-                </GroupControlElement>
-                <GroupControlElement
-                  aria-current={layout === 'stereoTopBottom'}
-                  onClick={() => setLayout('stereoTopBottom')}
-                >
-                  Top | Bottom
-                </GroupControlElement>
-              </GroupControl>
-              <GroupControl>
-                <GroupControlElement
-                  aria-current={format === 'screen'}
-                  onClick={() => setFormat('screen')}
-                >
-                  Screen
-                </GroupControlElement>
-                <GroupControlElement
-                  aria-current={format === '180'}
-                  onClick={() => setFormat('180')}
-                >
-                  180°
-                </GroupControlElement>
-                <GroupControlElement
-                  aria-current={format === '360'}
-                  onClick={() => setFormat('360')}
-                >
-                  360°
-                </GroupControlElement>
-              </GroupControl>
-              <Control aria-current={debug} onClick={() => setDebug(!debug)}>
-                Debug
-              </Control>
-            </div>
-            <div className="flex-1 overflow-auto py-4">
-              {/* eslint-disable-next-line jsx-a11y/media-has-caption */}
-              <video
-                className={classNames('h-full mx-auto shadow-sm', {
-                  'h-0': !ready,
-                })}
-                ref={videoRef}
-                preload="auto"
-                controls
-                autoPlay={autoplay}
-                loop
-              />
-              <div
-                hidden={ready}
-                className={classNames(
-                  'h-full flex justify-center items-center',
-                  { hidden: ready },
-                )}
-              >
-                <span className="p-8 text-xl font-medium">
-                  Just drag and drop a video file anywhere to play!
-                </span>
-              </div>
-            </div>
-          </div>
-          <canvas
-            ref={canvasRef}
-            onClick={() => {
-              setDebug(!debug);
-            }}
-            className={classNames(
-              'absolute top-0 right-0 w-[640px] h-[360px]',
-              {
-                hidden: !debug || !ready,
-              },
-            )}
-          />
-        </>
+      {videoRef.current && canvasRef.current && ready && debug && (
+        <DebugPlayer
+          video={videoRef.current}
+          canvas={canvasRef.current}
+          layout={layout}
+          format={format}
+        />
       )}
-    </DropZone>
+      {videoRef.current && canvasRef.current && ready && xrSession && (
+        <VrPlayer
+          xrSession={xrSession}
+          video={videoRef.current}
+          canvas={canvasRef.current}
+          layout={layout}
+          format={format}
+        />
+      )}
+
+      <UI fileInputProps={getInputProps()} />
+      <div className="flex-1 overflow-auto py-4">
+        {/* eslint-disable-next-line jsx-a11y/media-has-caption */}
+        <video
+          className={classNames('h-full mx-auto shadow-sm', {
+            'h-0': !ready,
+          })}
+          ref={videoRef}
+          preload="auto"
+          controls
+          autoPlay={autoPlay}
+          loop
+        />
+        <div
+          hidden={ready}
+          className={classNames('h-full flex justify-center items-center', {
+            hidden: ready,
+          })}
+        >
+          <span className="p-8 text-xl font-medium">
+            Just drag and drop a video file anywhere to play!
+          </span>
+        </div>
+      </div>
+      <canvas
+        ref={canvasRef}
+        onClick={() => {
+          setDebug(!debug);
+        }}
+        className={classNames('absolute top-0 right-0 w-[640px] h-[360px]', {
+          hidden: !debug || !ready,
+        })}
+      />
+    </div>
   );
 }

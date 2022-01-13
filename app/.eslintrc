@@ -2,10 +2,14 @@
   "env": {
     "jest": true
   },
+  "plugins": [
+    "react"
+  ],
   "extends": [
     "airbnb",
     "airbnb-typescript",
     "airbnb/hooks",
+    "plugin:react/recommended",
     "plugin:react/jsx-runtime",
     "../.eslintrc"
   ],

@@ -1,4 +1,6 @@
-import { useCallback, useEffect, useState } from 'react';
+import { useAtom } from 'jotai';
+import { useCallback, useEffect } from 'react';
+import { xrSessionAtom, xrSupportedAtom } from 'atoms/xr';
 import type { XRSession } from 'webxr';
 
 function checkForXRSupport() {
@@ -9,8 +11,8 @@ function checkForXRSupport() {
 }
 
 export const useXRSession = () => {
-  const [xrSupported, setXrSupported] = useState<boolean>(false);
-  const [xrSession, setXrSession] = useState<XRSession | undefined>(undefined);
+  const [xrSupported, setXrSupported] = useAtom(xrSupportedAtom);
+  const [xrSession, setXrSession] = useAtom(xrSessionAtom);
 
   useEffect(() => {
     const onDevicechange = () => {
@@ -24,11 +26,11 @@ export const useXRSession = () => {
     return () => {
       navigator.xr.removeEventListener('devicechange', onDevicechange);
     };
-  }, []);
+  }, [setXrSupported]);
 
   useEffect(() => {
     const onXrSessionEnd = () => {
-      setXrSession(undefined);
+      setXrSession(null);
     };
 
     if (xrSession) {
@@ -38,7 +40,7 @@ export const useXRSession = () => {
     return () => {
       xrSession?.removeEventListener('end', onXrSessionEnd);
     };
-  }, [xrSession]);
+  }, [setXrSession, xrSession]);
 
   const requestXrSession = useCallback(() => {
     if (xrSupported && !xrSession) {
@@ -46,11 +48,11 @@ export const useXRSession = () => {
         setXrSession(session);
       });
     }
-  }, [xrSession, xrSupported]);
+  }, [setXrSession, xrSession, xrSupported]);
 
-  return [xrSupported, requestXrSession, xrSession] as [
+  return [xrSupported, xrSession, requestXrSession] as [
     boolean,
+    XRSession | null,
     () => void,
-    XRSession | undefined,
   ];
 };
