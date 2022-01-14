@@ -10,6 +10,7 @@ import {
   layoutAtom,
 } from 'atoms/controls';
 import { useAtom } from 'jotai';
+import { useAtomValue } from 'jotai/utils';
 import { useXRSession } from 'hooks/useXRSession';
 import type { DropzoneInputProps } from 'react-dropzone';
 
@@ -17,7 +18,7 @@ export function UI({ fileInputProps }: { fileInputProps: DropzoneInputProps }) {
   const [autoPlay, setAutoPlay] = useAtom(autoPlayAtom);
   const [autoDetect, setAutoDetect] = useAtom(autoDetectAtom);
 
-  const [detecting] = useAtom(detectingAtom);
+  const detecting = useAtomValue(detectingAtom);
 
   const [layout, setLayout] = useAtom(layoutAtom);
   const [format, setFormat] = useAtom(formatAtom);

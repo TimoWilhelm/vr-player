@@ -14,6 +14,7 @@ import { getImageFrames } from 'helper/getImageFrames';
 import { useAtom } from 'jotai';
 import { useDropzone } from 'react-dropzone';
 import { useEffect, useRef, useState } from 'react';
+import { useUpdateAtom } from 'jotai/utils';
 import { useXRSession } from 'hooks/useXRSession';
 import { wrap } from 'comlink';
 import classNames from 'classnames';
@@ -40,7 +41,7 @@ export function App() {
 
   const [, xrSession] = useXRSession();
 
-  const [, setDetecting] = useAtom(detectingAtom);
+  const setDetecting = useUpdateAtom(detectingAtom);
 
   useEffect(() => {
     if (ready && videoRef.current && autoDetect) {

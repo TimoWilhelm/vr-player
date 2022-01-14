@@ -1,11 +1,17 @@
 import { XIcon } from '@heroicons/react/solid';
-import { useState } from 'react';
+import { atomWithStorage } from 'jotai/utils';
+import { useAtom } from 'jotai';
 import classNames from 'classnames';
 
 const isChromium = navigator.userAgent.match(/Chrome\/\d+/) !== null;
 
+const bugNotificationVisibleAtom = atomWithStorage(
+  'bugNotificationVisible',
+  isChromium,
+);
+
 export function BugNotification() {
-  const [visible, setVisible] = useState(isChromium);
+  const [visible, setVisible] = useAtom(bugNotificationVisibleAtom);
 
   return (
     <aside className={classNames({ hidden: !visible })}>
