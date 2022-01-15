@@ -2,30 +2,16 @@
 <html lang="en">
   <head>
     <meta charset="utf-8" />
-    <link rel="icon" href="%PUBLIC_URL%/favicon.ico" />
-    <link
-      rel="icon"
-      type="image/png"
-      sizes="32x32"
-      href="%PUBLIC_URL%/favicon-32x32.png"
-    />
-    <link
-      rel="icon"
-      type="image/png"
-      sizes="16x16"
-      href="%PUBLIC_URL%/favicon-16x16.png"
-    />
+    <link rel="icon" href="/favicon.ico" />
+    <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png" />
+    <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="theme-color" content="#ffffff" />
     <meta name="msapplication-TileColor" content="#ffffff" />
-    <link
-      rel="mask-icon"
-      href="%PUBLIC_URL%/safari-pinned-tab.svg"
-      color="#5bbad5"
-    />
-    <link rel="apple-touch-icon" href="%PUBLIC_URL%/apple-touch-icon.png" />
-    <link rel="manifest" href="%PUBLIC_URL%/manifest.json" />
-    <link rel="canonical" href="%PUBLIC_URL%" />
+    <link rel="mask-icon" href="/safari-pinned-tab.svg" color="#5bbad5" />
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+    <link rel="manifest" href="/manifest.json" />
+    <link rel="canonical" href="%REACT_APP_CANONICAL_URL%" />
     <title>VR Player | Play 360° 3D VR Videos in Your Browser</title>
     <meta
       name="description"
@@ -39,9 +25,14 @@
       property="og:description"
       content="Play your favorite 360° or 180° 3D VR videos. No download required, just drag and drop any video file to play. Supports all popular VR headsets."
     />
-    <meta property="og:image" content="%PUBLIC_URL%/thumbnail.png" />
-    <meta property="og:url" content="%PUBLIC_URL%" />
+    <meta
+      property="og:image"
+      content="%REACT_APP_CANONICAL_URL%/thumbnail.png"
+    />
+    <meta property="og:url" content="%REACT_APP_CANONICAL_URL%" />
     <meta property="og:type" content="website" />
+
+    <meta name="git:commit" content="%REACT_APP_VERCEL_GIT_COMMIT_SHA%" />
   </head>
   <body>
     <noscript>You need to enable JavaScript to run this app.</noscript>
