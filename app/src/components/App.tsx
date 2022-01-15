@@ -109,6 +109,7 @@ export function App() {
       )}
 
       <UI fileInputProps={getInputProps()} />
+
       <div className="flex-1 overflow-auto py-4">
         {/* eslint-disable-next-line jsx-a11y/media-has-caption */}
         <video

@@ -26,6 +26,7 @@ export function UI({ fileInputProps }: { fileInputProps: DropzoneInputProps }) {
   const [debug, setDebug] = useAtom(debugAtom);
 
   const [xrSupported, xrSession, requestXrSession] = useXRSession();
+
   return (
     <div
       data-nosnippet

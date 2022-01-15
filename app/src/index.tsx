@@ -2,14 +2,28 @@ import './index.css';
 import './polyfills';
 import * as serviceWorkerRegistration from './serviceWorkerRegistration';
 import { App } from 'components/App';
+import { ConditionalWrapper } from 'components/util/ConditionalWrapper';
 import { reportWebVitals } from './reportWebVitals';
+import { useAtomsDevtools } from 'jotai/devtools';
 import React from 'react';
 import ReactDOM from 'react-dom';
 import type { Metric } from 'web-vitals';
 
+const isProduction = process.env.NODE_ENV === 'production';
+
+const AtomsDevtools = ({ children }: { children: React.ReactElement }) => {
+  useAtomsDevtools('demo');
+  return children;
+};
+
 ReactDOM.render(
   <React.StrictMode>
-    <App />
+    <ConditionalWrapper
+      condition={!isProduction}
+      wrapper={(children) => <AtomsDevtools>{children}</AtomsDevtools>}
+    >
+      <App />
+    </ConditionalWrapper>
   </React.StrictMode>,
   document.getElementById('root'),
 );
