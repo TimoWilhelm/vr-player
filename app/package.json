@@ -19,7 +19,7 @@
     "comlink": "^4.3.1",
     "eslint-config-airbnb": "^19.0.4",
     "jest-canvas-mock": "^2.3.1",
-    "jotai": "^1.5.2",
+    "jotai": "https://pkg.csb.dev/pmndrs/jotai/commit/a2c80e05/jotai",
     "postcss": "^8.4.5",
     "react": "^17.0.2",
     "react-dom": "^17.0.2",
