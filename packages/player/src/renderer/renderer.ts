@@ -31,6 +31,7 @@ export abstract class Renderer {
   constructor(
     protected readonly canvas: HTMLCanvasElement,
     protected readonly layout: Layout,
+    protected readonly flipLayout: boolean,
     protected readonly format: Format,
   ) {
     const mesh = this.getMesh();
@@ -106,10 +107,10 @@ export abstract class Renderer {
 
   private getAspectRation(video: HTMLVideoElement) {
     switch (this.layout) {
-      case 'stereoTopBottom':
-        return (video.videoWidth / video.videoHeight) * 0.5;
       case 'stereoLeftRight':
         return (video.videoWidth * 0.5) / video.videoHeight;
+      case 'stereoTopBottom':
+        return (video.videoWidth / video.videoHeight) * 0.5;
       case 'mono':
       // falls through
       default:
@@ -143,24 +144,31 @@ export abstract class Renderer {
   }
 
   protected getTexCoordScaleOffsets() {
+    let offsets;
     switch (this.layout) {
-      case 'stereoTopBottom':
-        return [
-          new Float32Array([1.0, 0.5, 0.0, 0.0]),
-          new Float32Array([1.0, 0.5, 0.0, 0.5]),
-        ];
       case 'stereoLeftRight':
-        return [
+        offsets = [
           new Float32Array([0.5, 1.0, 0.0, 0.0]),
           new Float32Array([0.5, 1.0, 0.5, 0.0]),
         ];
+        break;
+      case 'stereoTopBottom':
+        offsets = [
+          new Float32Array([1.0, 0.5, 0.0, 0.0]),
+          new Float32Array([1.0, 0.5, 0.0, 0.5]),
+        ];
+        break;
       case 'mono':
       // falls through
       default:
-        return [
+        offsets = [
           new Float32Array([1.0, 1.0, 0.0, 0.0]),
           new Float32Array([1.0, 1.0, 0.0, 0.0]),
         ];
     }
+    if (this.flipLayout) {
+      return offsets.reverse();
+    }
+    return offsets;
   }
 }

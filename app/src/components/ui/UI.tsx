@@ -6,12 +6,14 @@ import {
   autoPlayAtom,
   debugAtom,
   detectingAtom,
+  flipLayoutAtom,
   formatAtom,
   layoutAtom,
 } from 'atoms/controls';
 import { useAtom } from 'jotai';
 import { useAtomValue } from 'jotai/utils';
 import { useXRSession } from 'hooks/useXRSession';
+import classNames from 'classnames';
 import type { DropzoneInputProps } from 'react-dropzone';
 
 export function UI({ fileInputProps }: { fileInputProps: DropzoneInputProps }) {
@@ -21,6 +23,7 @@ export function UI({ fileInputProps }: { fileInputProps: DropzoneInputProps }) {
   const detecting = useAtomValue(detectingAtom);
 
   const [layout, setLayout] = useAtom(layoutAtom);
+  const [flipLayout, setFlipLayout] = useAtom(flipLayoutAtom);
   const [format, setFormat] = useAtom(formatAtom);
 
   const [debug, setDebug] = useAtom(debugAtom);
@@ -30,7 +33,7 @@ export function UI({ fileInputProps }: { fileInputProps: DropzoneInputProps }) {
   return (
     <div
       data-nosnippet
-      className="flex flex-wrap items-center whitespace-nowrap"
+      className="flex flex-wrap items-start whitespace-nowrap"
     >
       <Control
         aria-current={Boolean(xrSession)}
@@ -52,6 +55,7 @@ export function UI({ fileInputProps }: { fileInputProps: DropzoneInputProps }) {
             : 'VR Not Supported'
         }
       </Control>
+
       <label
         htmlFor="file-input"
         className="cursor-pointer flex m-2 py-2 px-4 text-sm font-medium text-white bg-gray-700 hover:bg-gray-600 border border-gray-600 rounded-lg shadow-sm"
@@ -59,9 +63,11 @@ export function UI({ fileInputProps }: { fileInputProps: DropzoneInputProps }) {
         Select File
         <input id="file-input" {...fileInputProps} />
       </label>
+
       <Control aria-current={autoPlay} onClick={() => setAutoPlay(!autoPlay)}>
         Autoplay
       </Control>
+
       <div className="flex relative">
         {detecting && (
           <span className="absolute top-1 right-1 h-3 w-3" role="status">
@@ -84,26 +90,51 @@ export function UI({ fileInputProps }: { fileInputProps: DropzoneInputProps }) {
         </Control>
       </div>
 
-      <GroupControl>
-        <GroupControlElement
-          aria-current={layout === 'mono'}
-          onClick={() => setLayout('mono')}
+      <div className="flex flex-col items-center">
+        <GroupControl>
+          <GroupControlElement
+            aria-current={layout === 'mono'}
+            onClick={() => setLayout('mono')}
+          >
+            Mono
+          </GroupControlElement>
+          <GroupControlElement
+            aria-current={layout === 'stereoLeftRight'}
+            onClick={() => setLayout('stereoLeftRight')}
+          >
+            Left | Right
+          </GroupControlElement>
+          <GroupControlElement
+            aria-current={layout === 'stereoTopBottom'}
+            onClick={() => setLayout('stereoTopBottom')}
+          >
+            Top | Bottom
+          </GroupControlElement>
+        </GroupControl>
+
+        <div
+          className={classNames({
+            hidden: !(
+              layout === 'stereoLeftRight' || layout === 'stereoTopBottom'
+            ),
+          })}
         >
-          Mono
-        </GroupControlElement>
-        <GroupControlElement
-          aria-current={layout === 'stereoLeftRight'}
-          onClick={() => setLayout('stereoLeftRight')}
-        >
-          Left | Right
-        </GroupControlElement>
-        <GroupControlElement
-          aria-current={layout === 'stereoTopBottom'}
-          onClick={() => setLayout('stereoTopBottom')}
-        >
-          Top | Bottom
-        </GroupControlElement>
-      </GroupControl>
+          <label htmlFor="flip-orientation-input" className="flex items-center">
+            <input
+              id="flip-orientation-input"
+              type="checkbox"
+              className="block w-4 h-4 mr-2"
+              checked={flipLayout}
+              onChange={() => {
+                setFlipLayout(!flipLayout);
+              }}
+            />
+
+            <div>Flip Layout</div>
+          </label>
+        </div>
+      </div>
+
       <GroupControl>
         <GroupControlElement
           aria-current={format === 'screen'}
@@ -124,6 +155,7 @@ export function UI({ fileInputProps }: { fileInputProps: DropzoneInputProps }) {
           360°
         </GroupControlElement>
       </GroupControl>
+
       <Control aria-current={debug} onClick={() => setDebug(!debug)}>
         Debug
       </Control>

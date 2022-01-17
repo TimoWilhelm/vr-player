@@ -8,21 +8,30 @@ export function VrPlayer({
   video,
   canvas,
   layout,
+  flipLayout,
   format,
 }: {
   xrSession: XRSession;
   video: HTMLVideoElement;
   canvas: HTMLCanvasElement;
   layout: Layout;
+  flipLayout: boolean;
   format: Format;
 }) {
   useEffect(() => {
-    const renderer = new VrRenderer(xrSession, video, canvas, layout, format);
+    const renderer = new VrRenderer(
+      xrSession,
+      video,
+      canvas,
+      layout,
+      flipLayout,
+      format,
+    );
     void renderer.start();
     return () => {
       renderer.stop();
     };
-  }, [canvas, format, layout, video, xrSession]);
+  }, [canvas, flipLayout, format, layout, video, xrSession]);
 
   return null;
 }

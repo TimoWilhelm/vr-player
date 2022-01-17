@@ -13,10 +13,11 @@ export class DebugRenderer extends Renderer {
     private readonly video: HTMLVideoElement,
     canvas: HTMLCanvasElement,
     layout: Layout,
+    flipLayout: boolean,
     format: Format,
     private readonly view: 'left' | 'right',
   ) {
-    super(canvas, layout, format);
+    super(canvas, layout, flipLayout, format);
   }
 
   protected stopDrawLoop(): void {

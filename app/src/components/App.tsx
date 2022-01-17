@@ -7,6 +7,7 @@ import {
   autoPlayAtom,
   debugAtom,
   detectingAtom,
+  flipLayoutAtom,
   formatAtom,
   layoutAtom,
 } from 'atoms/controls';
@@ -29,6 +30,7 @@ export function App() {
   const canvasRef = useRef<HTMLCanvasElement>(null);
 
   const [layout, setLayout] = useAtom(layoutAtom);
+  const [flipLayout] = useAtom(flipLayoutAtom);
   const [format, setFormat] = useAtom(formatAtom);
 
   const [debug, setDebug] = useAtom(debugAtom);
@@ -95,6 +97,7 @@ export function App() {
           video={videoRef.current}
           canvas={canvasRef.current}
           layout={layout}
+          flipLayout={flipLayout}
           format={format}
         />
       )}
@@ -104,6 +107,7 @@ export function App() {
           video={videoRef.current}
           canvas={canvasRef.current}
           layout={layout}
+          flipLayout={flipLayout}
           format={format}
         />
       )}

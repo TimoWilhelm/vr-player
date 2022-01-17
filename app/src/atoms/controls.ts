@@ -6,6 +6,8 @@ export const autoDetectAtom = atom(true);
 export const detectingAtom = atom(false);
 
 export const layoutAtom = atom<Layout>('mono');
+export const flipLayoutAtom = atom(false);
+
 export const formatAtom = atom<Format>('screen');
 
 export const debugAtom = atom(false);
