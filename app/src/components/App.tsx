@@ -2,6 +2,7 @@ import { BugNotification } from './BugNotification';
 import { DebugPlayer } from 'components/DebugPlayer';
 import { UI } from './ui/UI';
 import { VrPlayer } from 'components/VrPlayer';
+import { XIcon } from '@heroicons/react/solid';
 import {
   autoDetectAtom,
   autoPlayAtom,
@@ -13,6 +14,7 @@ import {
 } from 'atoms/controls';
 import { getImageFrames } from 'helper/getImageFrames';
 import { useAtom } from 'jotai';
+import { useDraggable } from 'hooks/useDraggable';
 import { useDropzone } from 'react-dropzone';
 import { useEffect, useRef, useState } from 'react';
 import { useUpdateAtom } from 'jotai/utils';
@@ -76,6 +78,8 @@ export function App() {
     };
   }, [file, setReady]);
 
+  const draggableRef = useDraggable();
+
   const { getRootProps, getInputProps } = useDropzone({
     noClick: true,
     multiple: false,
@@ -138,15 +142,26 @@ export function App() {
           </span>
         </div>
       </div>
-      <canvas
-        ref={canvasRef}
-        onClick={() => {
-          setDebug(!debug);
-        }}
-        className={classNames('absolute top-0 right-0 w-[640px] h-[360px]', {
-          hidden: !debug || !ready,
-        })}
-      />
+      <div
+        ref={draggableRef}
+        className={classNames(
+          'absolute w-[640px] h-[360px] bg-gray-500 border border-white cursor-move',
+          {
+            hidden: !debug,
+          },
+        )}
+      >
+        <canvas ref={canvasRef} className="w-full h-full" />
+        <button
+          type="button"
+          className="absolute top-0 right-0"
+          onClick={() => {
+            setDebug(!debug);
+          }}
+        >
+          <XIcon className="h-5 w-5" />
+        </button>
+      </div>
     </div>
   );
 }
