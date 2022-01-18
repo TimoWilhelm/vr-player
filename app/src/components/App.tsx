@@ -116,7 +116,9 @@ export function App() {
         />
       )}
 
-      <UI fileInputProps={getInputProps()} />
+      <div className="mr-10">
+        <UI fileInputProps={getInputProps()} />
+      </div>
 
       <div className="flex-1 overflow-auto py-4">
         {/* eslint-disable-next-line jsx-a11y/media-has-caption */}
