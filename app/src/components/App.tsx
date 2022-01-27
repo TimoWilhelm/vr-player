@@ -1,8 +1,8 @@
 import { BugNotification } from './BugNotification';
 import { DebugPlayer } from 'components/DebugPlayer';
+import { DocumentDownloadIcon, XIcon } from '@heroicons/react/solid';
 import { UI } from './ui/UI';
 import { VrPlayer } from 'components/VrPlayer';
-import { XIcon } from '@heroicons/react/solid';
 import {
   autoDetectAtom,
   autoPlayAtom,
@@ -80,7 +80,7 @@ export function App() {
 
   const draggableRef = useDraggable();
 
-  const { getRootProps, getInputProps } = useDropzone({
+  const { getRootProps, getInputProps, isDragActive } = useDropzone({
     noClick: true,
     multiple: false,
     accept: 'video/*',
@@ -163,6 +163,19 @@ export function App() {
         >
           <XIcon className="h-5 w-5" />
         </button>
+      </div>
+      <div
+        className={classNames(
+          'absolute w-full h-full pointer-events-none flex items-center justify-center',
+          {
+            hidden: !isDragActive,
+          },
+        )}
+      >
+        <div className="absolute w-full h-full bg-black opacity-50 border-8 border-dashed" />
+        <div className="w-10 h-10 z-10 animate-bounce ">
+          <DocumentDownloadIcon />
+        </div>
       </div>
     </div>
   );

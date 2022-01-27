@@ -52,9 +52,5 @@ export const useXRSession = () => {
     }
   }, [setXrSession, xrSession, xrSupported]);
 
-  return [xrSupported, xrSession, requestXrSession] as [
-    boolean,
-    XRSession | null,
-    () => void,
-  ];
+  return [xrSupported, xrSession, requestXrSession] as const;
 };
