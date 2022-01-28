@@ -1,6 +1,7 @@
 import { BugNotification } from './BugNotification';
 import { DebugPlayer } from 'components/DebugPlayer';
 import { DocumentDownloadIcon, XIcon } from '@heroicons/react/solid';
+import { Toaster, toast } from 'react-hot-toast';
 import { UI } from './ui/UI';
 import { VrPlayer } from 'components/VrPlayer';
 import {
@@ -84,8 +85,11 @@ export function App() {
     noClick: true,
     multiple: false,
     accept: 'video/*',
-    onDrop: (acceptedFiles) => {
+    onDropAccepted: (acceptedFiles) => {
       setFile(acceptedFiles[0]);
+    },
+    onDropRejected: (rejection) => {
+      toast.error(rejection[0].errors[0].message);
     },
   });
 
@@ -94,6 +98,8 @@ export function App() {
       className="h-full flex flex-col bg-gray-900 text-white"
       {...getRootProps()}
     >
+      <Toaster position="bottom-center" reverseOrder={false} />
+
       <BugNotification />
 
       {videoRef.current && canvasRef.current && ready && debug && (
