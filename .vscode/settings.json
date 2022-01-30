@@ -20,8 +20,5 @@
   "editor.codeActionsOnSave": {
     "source.fixAll": true
   },
-  "files.exclude": {
-    "**/package-lock.json": true
-  },
   "yaml.format.singleQuote": true
 }
