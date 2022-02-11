@@ -10,8 +10,7 @@ import {
   formatAtom,
   layoutAtom,
 } from 'atoms/controls';
-import { useAtom } from 'jotai';
-import { useAtomValue } from 'jotai/utils';
+import { useAtom, useAtomValue } from 'jotai';
 import { useXRSession } from 'hooks/useXRSession';
 import classNames from 'classnames';
 import type { DropzoneInputProps } from 'react-dropzone';

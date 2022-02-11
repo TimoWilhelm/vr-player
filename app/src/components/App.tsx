@@ -14,11 +14,10 @@ import {
   layoutAtom,
 } from 'atoms/controls';
 import { getImageFrames } from 'helper/getImageFrames';
-import { useAtom } from 'jotai';
+import { useAtom, useSetAtom } from 'jotai';
 import { useDraggable } from 'hooks/useDraggable';
 import { useDropzone } from 'react-dropzone';
 import { useEffect, useRef, useState } from 'react';
-import { useUpdateAtom } from 'jotai/utils';
 import { useXRSession } from 'hooks/useXRSession';
 import { wrap } from 'comlink';
 import classNames from 'classnames';
@@ -46,7 +45,7 @@ export function App() {
 
   const [, xrSession] = useXRSession();
 
-  const setDetecting = useUpdateAtom(detectingAtom);
+  const setDetecting = useSetAtom(detectingAtom);
 
   useEffect(() => {
     if (ready && videoRef.current && autoDetect) {
