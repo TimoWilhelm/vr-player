@@ -9,5 +9,8 @@ export function recognizeVideo(frames: ImageData[]): [Layout?, Format?] {
   return [layout, format];
 }
 
-export type VideoRecognitionWorkerType = typeof recognizeVideo;
-expose(recognizeVideo);
+const module = { recognizeVideo };
+
+expose(module);
+
+export type VideoRecognitionWorker = typeof module;

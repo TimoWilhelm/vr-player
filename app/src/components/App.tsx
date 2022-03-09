@@ -14,16 +14,16 @@ import {
   layoutAtom,
 } from 'atoms/controls';
 import { getImageFrames } from 'helper/getImageFrames';
+import { transfer, wrap } from 'comlink';
 import { useAtom, useSetAtom } from 'jotai';
 import { useDraggable } from 'hooks/useDraggable';
 import { useDropzone } from 'react-dropzone';
 import { useEffect, useRef, useState } from 'react';
 import { useXRSession } from 'hooks/useXRSession';
-import { wrap } from 'comlink';
 import classNames from 'classnames';
-import type { VideoRecognitionWorkerType } from 'worker/videoRecognition.worker';
+import type { VideoRecognitionWorker } from 'worker/videoRecognition.worker';
 
-const recognizeVideo = wrap<VideoRecognitionWorkerType>(
+const worker = wrap<VideoRecognitionWorker>(
   new Worker(new URL('worker/videoRecognition.worker', import.meta.url)),
 );
 
@@ -53,7 +53,10 @@ export function App() {
 
       void (async (video) => {
         const frames = await getImageFrames(video);
-        const [detectedLayout, detectedFormat] = await recognizeVideo(frames);
+
+        const [detectedLayout, detectedFormat] = await worker.recognizeVideo(
+          transfer(frames, [...frames.map((frame) => frame.data.buffer)]),
+        );
 
         if (detectedLayout) setLayout(detectedLayout);
         if (detectedFormat) setFormat(detectedFormat);
