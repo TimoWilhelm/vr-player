@@ -20,6 +20,12 @@
     "plugin:prettier/recommended"
   ],
   "rules": {
+    "@typescript-eslint/no-explicit-any": [
+      "error",
+      {
+        "ignoreRestArgs": true
+      }
+    ],
     "import/prefer-default-export": "off",
     "import/no-default-export": "error",
     "object-curly-newline": "off",
