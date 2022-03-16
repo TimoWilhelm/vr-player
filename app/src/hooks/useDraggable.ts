@@ -8,12 +8,11 @@ function isTouchEvent(event: MouseEvent | TouchEvent): event is TouchEvent {
 export function useDraggable(initialPos = { x: 0, y: 0 }) {
   const dragElementRef = useRef<HTMLDivElement>(null);
 
-  const isDragging = useRef(false);
   const [position, setPosition] = useState(initialPos);
 
-  const [previousEventPos, setPreviousEventPos] = useState({ x: 0, y: 0 });
-
-  const [touchId, setTouchId] = useState(0);
+  const previousEventPos = useRef({ x: 0, y: 0 });
+  const isDragging = useRef(false);
+  const touchId = useRef(-1);
 
   const handleStart = useCallback((e: MouseEvent | TouchEvent) => {
     if (
@@ -23,13 +22,13 @@ export function useDraggable(initialPos = { x: 0, y: 0 }) {
     ) {
       if (isTouchEvent(e)) {
         const touch = e.changedTouches[0];
-        setTouchId(touch.identifier);
-        setPreviousEventPos({
+        touchId.current = touch.identifier;
+        previousEventPos.current = {
           x: touch.clientX,
           y: touch.clientY,
-        });
+        };
       } else {
-        setPreviousEventPos({ x: e.clientX, y: e.clientY });
+        previousEventPos.current = { x: e.clientX, y: e.clientY };
       }
 
       isDragging.current = true;
@@ -41,13 +40,13 @@ export function useDraggable(initialPos = { x: 0, y: 0 }) {
       if (isDragging.current) {
         if (isTouchEvent(e)) {
           const touch = Array.from(e.changedTouches).find(
-            (t) => t.identifier === touchId,
+            (t) => t.identifier === touchId.current,
           );
           if (touch) {
-            const movementX = touch.clientX - previousEventPos.x;
-            const movementY = touch.clientY - previousEventPos.y;
+            const movementX = touch.clientX - previousEventPos.current.x;
+            const movementY = touch.clientY - previousEventPos.current.y;
 
-            setPreviousEventPos({ x: touch.clientX, y: touch.clientY });
+            previousEventPos.current = { x: touch.clientX, y: touch.clientY };
 
             setPosition((pos) => ({
               x: pos.x + movementX,
@@ -59,11 +58,11 @@ export function useDraggable(initialPos = { x: 0, y: 0 }) {
             x: pos.x + e.movementX,
             y: pos.y + e.movementY,
           }));
-          setPreviousEventPos({ x: e.clientX, y: e.clientY });
+          previousEventPos.current = { x: e.clientX, y: e.clientY };
         }
       }
     },
-    [previousEventPos.x, previousEventPos.y, touchId],
+    [touchId],
   );
 
   const handleStop = useCallback(
@@ -71,7 +70,9 @@ export function useDraggable(initialPos = { x: 0, y: 0 }) {
       if (isDragging.current) {
         if (isTouchEvent(e)) {
           if (
-            !Array.from(e.changedTouches).find((t) => t.identifier === touchId)
+            !Array.from(e.changedTouches).find(
+              (t) => t.identifier === touchId.current,
+            )
           ) {
             return;
           }
