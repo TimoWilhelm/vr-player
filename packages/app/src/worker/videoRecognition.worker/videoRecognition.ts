@@ -1,6 +1,8 @@
 import { linSpace, nWise } from 'helper/util';
 import type { Format, Layout } from '@vr-viewer/player';
 
+const PIXEL_RGBA_SIZE = 4;
+
 function getPixelDiff(a: number[][], b: number[][]) {
   const diffs = a.map((pixel, index) => {
     const rDiff = pixel[0] - b[index][0];
@@ -14,21 +16,21 @@ function getPixelDiff(a: number[][], b: number[][]) {
 
 function getPixelRow(imageData: ImageData, row: number) {
   const rowData = imageData.data.slice(
-    row * imageData.width * 4,
-    (row + 1) * imageData.width * 4,
+    row * imageData.width * PIXEL_RGBA_SIZE,
+    (row + 1) * imageData.width * PIXEL_RGBA_SIZE,
   );
-  return Array.from(nWise(4, rowData));
+  return Array.from(nWise(PIXEL_RGBA_SIZE, rowData));
 }
 
 function getPixelColumn(imageData: ImageData, column: number) {
   const columnPixels = [] as number[][];
 
   for (
-    let i = column * 4;
-    i < imageData.height * imageData.width * 4;
-    i += imageData.width * 4
+    let i = column * PIXEL_RGBA_SIZE;
+    i < imageData.height * imageData.width * PIXEL_RGBA_SIZE;
+    i += imageData.width * PIXEL_RGBA_SIZE
   ) {
-    columnPixels.push(Array.from(imageData.data.slice(i, i + 4)));
+    columnPixels.push(Array.from(imageData.data.slice(i, i + PIXEL_RGBA_SIZE)));
   }
 
   return columnPixels;
