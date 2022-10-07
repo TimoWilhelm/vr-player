@@ -135,6 +135,7 @@ export function App() {
             'h-0': !ready,
           })}
           ref={videoRef}
+          playsInline
           preload="auto"
           controls
           autoPlay={autoPlay}
