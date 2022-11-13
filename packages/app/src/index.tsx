@@ -3,10 +3,10 @@ import './polyfills';
 import * as serviceWorkerRegistration from './serviceWorkerRegistration';
 import { App } from 'components/App';
 import { ConditionalWrapper } from 'components/util/ConditionalWrapper';
+import { createRoot } from 'react-dom/client';
 import { reportWebVitals } from './reportWebVitals';
 import { useAtomsDevtools } from 'jotai/devtools';
 import React from 'react';
-import ReactDOM from 'react-dom';
 import type { Metric } from 'web-vitals';
 
 const isProduction = process.env.NODE_ENV === 'production';
@@ -16,7 +16,10 @@ const AtomsDevtools = ({ children }: { children: React.ReactElement }) => {
   return children;
 };
 
-ReactDOM.render(
+// eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+const root = createRoot(document.getElementById('root')!);
+
+root.render(
   <React.StrictMode>
     <ConditionalWrapper
       condition={!isProduction}
@@ -25,7 +28,6 @@ ReactDOM.render(
       <App />
     </ConditionalWrapper>
   </React.StrictMode>,
-  document.getElementById('root'),
 );
 
 const sendToAnalytics = ({ id, name, value }: Metric) => {

@@ -1,6 +1,6 @@
+import { ArrowDownTrayIcon, XMarkIcon } from '@heroicons/react/24/solid';
 import { BugNotification } from './BugNotification';
 import { DebugPlayer } from 'components/DebugPlayer';
-import { DocumentDownloadIcon, XIcon } from '@heroicons/react/solid';
 import { Toaster, toast } from 'react-hot-toast';
 import { UI } from './ui/UI';
 import { VrPlayer } from 'components/VrPlayer';
@@ -86,7 +86,9 @@ export function App() {
   const { getRootProps, getInputProps, isDragActive } = useDropzone({
     noClick: true,
     multiple: false,
-    accept: 'video/*',
+    accept: {
+      'video/*': [],
+    },
     onDropAccepted: (acceptedFiles) => {
       setFile(acceptedFiles[0]);
     },
@@ -170,7 +172,7 @@ export function App() {
             setDebug(!debug);
           }}
         >
-          <XIcon className="h-5 w-5" />
+          <XMarkIcon className="h-5 w-5" />
         </button>
       </div>
       <div
@@ -183,7 +185,7 @@ export function App() {
       >
         <div className="absolute w-full h-full bg-black opacity-50 border-8 border-dashed" />
         <div className="w-10 h-10 z-10 animate-bounce ">
-          <DocumentDownloadIcon />
+          <ArrowDownTrayIcon />
         </div>
       </div>
     </div>

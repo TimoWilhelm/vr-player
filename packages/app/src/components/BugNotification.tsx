@@ -1,4 +1,4 @@
-import { XIcon } from '@heroicons/react/solid';
+import { XMarkIcon } from '@heroicons/react/24/solid';
 import { atomWithStorage } from 'jotai/utils';
 import { useAtom } from 'jotai';
 import classNames from 'classnames';
@@ -39,7 +39,7 @@ export function BugNotification() {
           }}
           className="px-2"
         >
-          <XIcon className="h-5 w-5" />
+          <XMarkIcon className="h-5 w-5" />
         </button>
       </div>
     </aside>

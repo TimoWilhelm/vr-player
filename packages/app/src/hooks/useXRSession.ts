@@ -1,6 +1,5 @@
 import { atom, useAtom } from 'jotai';
 import { useCallback, useEffect } from 'react';
-import type { XRSession } from 'webxr';
 
 const xrSupportedAtom = atom(false);
 const xrSessionAtom = atom<XRSession | null>(null);
@@ -21,12 +20,12 @@ export const useXRSession = () => {
       void checkForXRSupport().then(setXrSupported);
     };
 
-    navigator.xr.addEventListener('devicechange', onDevicechange);
+    navigator.xr?.addEventListener('devicechange', onDevicechange);
 
     onDevicechange();
 
     return () => {
-      navigator.xr.removeEventListener('devicechange', onDevicechange);
+      navigator.xr?.removeEventListener('devicechange', onDevicechange);
     };
   }, [setXrSupported]);
 
@@ -46,7 +45,7 @@ export const useXRSession = () => {
 
   const requestXrSession = useCallback(() => {
     if (xrSupported && !xrSession) {
-      void navigator.xr.requestSession('immersive-vr').then((session) => {
+      void navigator.xr?.requestSession('immersive-vr').then((session) => {
         setXrSession(session);
       });
     }

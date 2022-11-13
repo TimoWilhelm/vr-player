@@ -1,7 +1,6 @@
 import { VrRenderer } from '@vr-viewer/player';
 import { useEffect } from 'react';
 import type { Format, Layout } from '@vr-viewer/player';
-import type { XRSession } from 'webxr';
 
 export function VrPlayer({
   xrSession,

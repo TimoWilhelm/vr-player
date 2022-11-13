@@ -5,7 +5,6 @@ import type { Format } from '../format';
 import type { Layout } from '../layout';
 import type { RenderProps } from './renderProps';
 import type { Texture2DOptions } from 'regl';
-import type { XRFrame, XRFrameRequestCallback, XRSession } from 'webxr';
 
 export class VrRenderer extends Renderer {
   private raf = 0;
@@ -27,12 +26,8 @@ export class VrRenderer extends Renderer {
 
   protected async startDrawLoop(): Promise<void> {
     // **** First hack to get this to work with regl:
-    // @ts-expect-error unstable API
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-call
     await this.regl._gl.makeXRCompatible();
     await this.xrSession.updateRenderState({
-      // @ts-expect-error unstable API
-      // eslint-disable-next-line @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-assignment
       baseLayer: new XRWebGLLayer(this.xrSession, this.regl._gl),
       depthFar: this.xrSession.renderState.depthFar,
       depthNear: this.xrSession.renderState.depthNear,
@@ -78,6 +73,12 @@ export class VrRenderer extends Renderer {
       pose.views.forEach((poseView) => {
         const { position } = poseView.transform;
 
+        const viewport = glLayer.getViewport(poseView);
+
+        if (viewport === undefined) {
+          throw new Error('Viewport is undefined');
+        }
+
         const props: RenderProps = {
           model,
           view: mat4.translate(
@@ -87,7 +88,7 @@ export class VrRenderer extends Renderer {
           ),
           projection: poseView.projectionMatrix,
           texture: texture.subimage(textureProps),
-          viewport: glLayer.getViewport(poseView),
+          viewport,
           texCoordScaleOffset:
             poseView.eye === 'left' ? offsets[0] : offsets[1],
         };
