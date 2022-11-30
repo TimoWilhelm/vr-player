@@ -15,7 +15,7 @@
     "@types/webxr": "^0.5.0",
     "@vr-viewer/player": "*",
     "autoprefixer": "^10.4.13",
-    "classnames": "^2.3.2",
+    "clsx": "^1.2.1",
     "comlink": "^4.3.1",
     "eslint-config-airbnb": "^19.0.4",
     "eslint-config-airbnb-typescript": "^17.0.0",

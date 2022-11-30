@@ -12,7 +12,7 @@ import {
 } from 'atoms/controls';
 import { useAtom, useAtomValue } from 'jotai';
 import { useXRSession } from 'hooks/useXRSession';
-import classNames from 'classnames';
+import clsx from 'clsx';
 import type { DropzoneInputProps } from 'react-dropzone';
 
 export function UI({ fileInputProps }: { fileInputProps: DropzoneInputProps }) {
@@ -112,7 +112,7 @@ export function UI({ fileInputProps }: { fileInputProps: DropzoneInputProps }) {
         </GroupControl>
 
         <div
-          className={classNames({
+          className={clsx({
             hidden: !(
               layout === 'stereoLeftRight' || layout === 'stereoTopBottom'
             ),

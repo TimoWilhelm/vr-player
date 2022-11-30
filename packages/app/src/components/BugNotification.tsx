@@ -1,7 +1,7 @@
 import { XMarkIcon } from '@heroicons/react/24/solid';
 import { atomWithStorage } from 'jotai/utils';
 import { useAtom } from 'jotai';
-import classNames from 'classnames';
+import clsx from 'clsx';
 
 const isChromium = navigator.userAgent.match(/Chrome\/\d+/) !== null;
 
@@ -14,7 +14,7 @@ export function BugNotification() {
   const [visible, setVisible] = useAtom(bugNotificationVisibleAtom);
 
   return (
-    <aside className={classNames({ hidden: !visible })}>
+    <aside className={clsx({ hidden: !visible })}>
       <div
         data-nosnippet
         className="flex text-white text-center font-medium bg-red-900"
@@ -24,7 +24,7 @@ export function BugNotification() {
             Please note that chromium based browsers currently have an{' '}
             <a
               href="https://bugs.chromium.org/p/chromium/issues/detail?id=612542"
-              className="text-blue-400 underline"
+              className="text-blue-300 underline"
             >
               issue
             </a>{' '}
@@ -38,6 +38,7 @@ export function BugNotification() {
             setVisible(false);
           }}
           className="px-2"
+          aria-label="Close notification"
         >
           <XMarkIcon className="h-5 w-5" />
         </button>

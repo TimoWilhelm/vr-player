@@ -31,7 +31,6 @@ root.render(
 );
 
 const sendToAnalytics = ({ id, name, value }: Metric) => {
-  // TODO: send to analytics -> navigator.sendBeacon(url, ...)
   // eslint-disable-next-line no-console
   console.log(id, name, value);
 };

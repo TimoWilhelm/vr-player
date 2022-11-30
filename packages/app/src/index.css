@@ -2,8 +2,25 @@
 @tailwind components;
 @tailwind utilities;
 
-html,
-body,
-#root {
-  height: 100%;
+@layer base {
+  html,
+  body,
+  #root {
+    height: 100%;
+    @apply bg-gray-900;
+  }
+}
+
+@layer components {
+  .grid-effect {
+    background: linear-gradient(
+        180deg,
+        transparent 0,
+        theme('colors.slate.800') 66vh
+      ),
+      fixed 0 0 /20px 20px radial-gradient(rgba(236, 236, 236, 0.2) 1px, transparent
+            0),
+      fixed 10px 10px /20px 20px radial-gradient(rgba(236, 236, 236, 0.2) 1px, transparent
+            0);
+  }
 }

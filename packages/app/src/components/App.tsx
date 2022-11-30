@@ -20,7 +20,7 @@ import { useDraggable } from 'hooks/useDraggable';
 import { useDropzone } from 'react-dropzone';
 import { useEffect, useRef, useState } from 'react';
 import { useXRSession } from 'hooks/useXRSession';
-import classNames from 'classnames';
+import clsx from 'clsx';
 import type { VideoRecognitionWorker } from 'worker/videoRecognition.worker';
 
 const worker = wrap<VideoRecognitionWorker>(
@@ -99,7 +99,7 @@ export function App() {
 
   return (
     <div
-      className="h-full flex flex-col bg-gray-900 text-white"
+      className="h-full flex-1 flex flex-col text-white grid-effect"
       {...getRootProps()}
     >
       <Toaster position="bottom-center" reverseOrder={false} />
@@ -133,7 +133,7 @@ export function App() {
       <div className="flex-1 overflow-auto py-4">
         {/* eslint-disable-next-line jsx-a11y/media-has-caption */}
         <video
-          className={classNames('h-full mx-auto shadow-sm', {
+          className={clsx('h-full mx-auto shadow-lg rounded', {
             'h-0': !ready,
           })}
           ref={videoRef}
@@ -146,18 +146,21 @@ export function App() {
         />
         <div
           hidden={ready}
-          className={classNames('h-full flex justify-center items-center', {
+          className={clsx('h-full flex flex-col justify-center items-center', {
             hidden: ready,
           })}
         >
-          <span className="p-8 text-xl font-medium">
-            Just drag and drop a video file anywhere to play!
-          </span>
+          <div className="text-center text-xl font-medium p-8">
+            <span className="inline-block">
+              Just drag and drop a video file anywhere to play!
+            </span>{' '}
+            <span className="inline-block">(It never leaves your browser)</span>
+          </div>
         </div>
       </div>
       <div
         ref={draggableRef}
-        className={classNames(
+        className={clsx(
           'absolute w-[640px] h-[360px] bg-gray-500 border border-white cursor-move',
           {
             hidden: !debug,
@@ -171,12 +174,13 @@ export function App() {
           onClick={() => {
             setDebug(!debug);
           }}
+          aria-label="Close preview"
         >
           <XMarkIcon className="h-5 w-5" />
         </button>
       </div>
       <div
-        className={classNames(
+        className={clsx(
           'absolute w-full h-full pointer-events-none flex items-center justify-center',
           {
             hidden: !isDragActive,

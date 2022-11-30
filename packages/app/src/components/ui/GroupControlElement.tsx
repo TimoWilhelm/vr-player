@@ -1,4 +1,4 @@
-import classNames from 'classnames';
+import clsx from 'clsx';
 import type React from 'react';
 
 export function GroupControlElement(
@@ -9,7 +9,7 @@ export function GroupControlElement(
   return (
     <button
       type="button"
-      className={classNames(
+      className={clsx(
         'py-2 px-4 text-sm font-medium text-white bg-gray-700 hover:bg-gray-600 border-gray-600 border-t border-b first:border last:border first:rounded-l-lg last:rounded-r-lg disabled:opacity-50 disabled:hover:bg-gray-700 ',
         { 'bg-cyan-700 hover:bg-cyan-600': ariaCurrent },
       )}

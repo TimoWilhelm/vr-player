@@ -1,4 +1,10 @@
 {
+  "files.associations": {
+    "*.css": "tailwindcss"
+  },
+  "editor.quickSuggestions": {
+    "strings": true
+  },
   "debug.internalConsoleOptions": "neverOpen",
   "eslint.validate": [
     "javascript",
