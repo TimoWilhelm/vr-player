@@ -1,8 +1,7 @@
 /* eslint-disable no-underscore-dangle */
 import { Renderer } from './renderer';
 import { mat4, vec3 } from 'gl-matrix';
-import type { Format } from '../format';
-import type { Layout } from '../layout';
+import type { Format, Layout } from '../types';
 import type { RenderProps } from './renderProps';
 import type { Texture2DOptions } from 'regl';
 

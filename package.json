@@ -4,14 +4,14 @@
     "./packages/app"
   ],
   "devDependencies": {
-    "@typescript-eslint/eslint-plugin": "^5.48.1",
-    "@typescript-eslint/parser": "^5.48.1",
-    "eslint": "^8.31.0",
+    "@typescript-eslint/eslint-plugin": "^5.48.2",
+    "@typescript-eslint/parser": "^5.48.2",
+    "eslint": "^8.32.0",
     "eslint-config-prettier": "^8.6.0",
     "eslint-plugin-prettier": "^4.2.1",
     "eslint-plugin-sort-imports-es6-autofix": "^0.6.0",
     "npm-check-updates": "^16.6.2",
-    "prettier": "^2.8.2"
+    "prettier": "^2.8.3"
   },
   "scripts": {
     "start": "npm run start --workspace packages/app",

@@ -5,7 +5,7 @@ import { App } from 'components/App';
 import { ConditionalWrapper } from 'components/util/ConditionalWrapper';
 import { createRoot } from 'react-dom/client';
 import { reportWebVitals } from './reportWebVitals';
-import { useAtomsDevtools } from 'jotai/devtools';
+import { useAtomsDevtools } from 'jotai-devtools';
 import React from 'react';
 import type { Metric } from 'web-vitals';
 

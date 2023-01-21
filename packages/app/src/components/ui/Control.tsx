@@ -1,5 +1,4 @@
 import clsx from 'clsx';
-import type React from 'react';
 
 export function Control(
   props: Omit<React.HTMLProps<HTMLButtonElement>, 'type' | 'className'>,
