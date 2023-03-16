@@ -103,9 +103,7 @@ export function App() {
       {...getRootProps()}
     >
       <Toaster position="bottom-center" reverseOrder={false} />
-
       <BugNotification />
-
       {videoRef.current && canvasRef.current && ready && debug && (
         <DebugPlayer
           video={videoRef.current}
@@ -125,17 +123,15 @@ export function App() {
           format={format}
         />
       )}
-
       <div className="mr-10">
         <UI fileInputProps={getInputProps()} />
       </div>
-
       <div className="flex-1 overflow-auto py-4">
         {/* eslint-disable-next-line jsx-a11y/media-has-caption */}
         <video
-          className={clsx('h-full mx-auto shadow-lg rounded', {
-            'h-0': !ready,
-          })}
+          className={clsx('mx-auto shadow-lg rounded', [
+            ready ? 'h-full' : 'h-0',
+          ])}
           ref={videoRef}
           playsInline
           preload="auto"
