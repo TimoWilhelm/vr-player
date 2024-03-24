@@ -40,9 +40,8 @@ export class VrRenderer extends Renderer {
     const view = mat4.create();
 
     const offsets = this.getTexCoordScaleOffsets();
-    const xrReferenceSpace = await this.xrSession.requestReferenceSpace(
-      'local',
-    );
+    const xrReferenceSpace =
+      await this.xrSession.requestReferenceSpace('local');
 
     const drawLoop: XRFrameRequestCallback = (
       _time: DOMHighResTimeStamp,

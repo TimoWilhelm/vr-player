@@ -1,5 +1,4 @@
 import { ArrowDownTrayIcon, XMarkIcon } from '@heroicons/react/24/solid';
-import { BugNotification } from './BugNotification';
 import { DebugPlayer } from 'components/DebugPlayer';
 import { Toaster, toast } from 'react-hot-toast';
 import { UI } from './ui/UI';
@@ -103,7 +102,6 @@ export function App() {
       {...getRootProps()}
     >
       <Toaster position="bottom-center" reverseOrder={false} />
-      <BugNotification />
       {videoRef.current && canvasRef.current && ready && debug && (
         <DebugPlayer
           video={videoRef.current}
