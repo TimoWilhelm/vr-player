@@ -15,7 +15,6 @@ import {
 import { getImageFrames } from 'helper/getImageFrames';
 import { transfer, wrap } from 'comlink';
 import { useAtom, useSetAtom } from 'jotai';
-import { useDraggable } from 'hooks/useDraggable';
 import { useDropzone } from 'react-dropzone';
 import { useEffect, useRef, useState } from 'react';
 import { useXRSession } from 'hooks/useXRSession';
@@ -79,8 +78,6 @@ export function App() {
       URL.revokeObjectURL(objectUrl);
     };
   }, [file, setReady]);
-
-  const draggableRef = useDraggable();
 
   const { getRootProps, getInputProps, isDragActive } = useDropzone({
     noClick: true,
@@ -153,9 +150,8 @@ export function App() {
         </div>
       </div>
       <div
-        ref={draggableRef}
         className={clsx(
-          'absolute w-[640px] h-[360px] bg-gray-500 border border-white cursor-move',
+          'fixed max-h-[360px] aspect-video h-[30vh] bg-gray-600 border-2 border-white rounded bottom-2 right-2',
           {
             hidden: !debug,
           },
@@ -164,7 +160,7 @@ export function App() {
         <canvas ref={canvasRef} className="w-full h-full" />
         <button
           type="button"
-          className="absolute top-0 right-0"
+          className="absolute top-0 right-0 p-3"
           onClick={() => {
             setDebug(!debug);
           }}
