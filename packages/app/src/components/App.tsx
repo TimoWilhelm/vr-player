@@ -20,6 +20,7 @@ import { useDropzone } from 'react-dropzone';
 import { useEffect, useRef, useState } from 'react';
 import { useXRSession } from 'hooks/useXRSession';
 import clsx from 'clsx';
+import styles from './dom-overlay.module.css';
 import type { VideoRecognitionWorker } from 'worker/videoRecognition.worker';
 
 const worker = wrap<VideoRecognitionWorker>(
@@ -121,6 +122,7 @@ export function App() {
           format={format}
         />
       )}
+      <div className={styles['dom-overlay']}>Test</div>
       <div className="mr-10">
         <UI fileInputProps={getInputProps()} />
       </div>

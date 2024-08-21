@@ -45,9 +45,20 @@ export const useXRSession = () => {
 
   const requestXrSession = useCallback(() => {
     if (xrSupported && !xrSession) {
-      void navigator.xr?.requestSession('immersive-vr').then((session) => {
-        setXrSession(session);
-      });
+      const domOverlayElement = document.getElementById('dom-overlay');
+
+      void navigator.xr
+        ?.requestSession('immersive-vr', {
+          optionalFeatures: ['dom-overlay'],
+          domOverlay: domOverlayElement
+            ? {
+                root: domOverlayElement,
+              }
+            : undefined,
+        })
+        .then((session) => {
+          setXrSession(session);
+        });
     }
   }, [setXrSession, xrSession, xrSupported]);
 
