@@ -9,6 +9,7 @@ import {
   flipLayoutAtom,
   formatAtom,
   layoutAtom,
+  videoUrlAtom,
 } from 'atoms/controls';
 import { useAtom, useAtomValue } from 'jotai';
 import { useXRSession } from 'hooks/useXRSession';
@@ -26,6 +27,8 @@ export function UI({ fileInputProps }: { fileInputProps: DropzoneInputProps }) {
   const [format, setFormat] = useAtom(formatAtom);
 
   const [debug, setDebug] = useAtom(debugAtom);
+
+  const [, setVideoUrl] = useAtom(videoUrlAtom);
 
   const [xrSupported, xrSession, requestXrSession] = useXRSession();
 
@@ -62,6 +65,21 @@ export function UI({ fileInputProps }: { fileInputProps: DropzoneInputProps }) {
         Select File
         <input id="file-input" {...fileInputProps} />
       </label>
+
+      <button
+        type="button"
+        className="cursor-pointer flex m-2 py-2 px-4 text-sm font-medium text-white bg-gray-700 hover:bg-gray-600 border border-gray-600 rounded-lg shadow-sm"
+        onClick={() => {
+          const fileInput = document.getElementById(
+            'file-input',
+          ) as HTMLInputElement;
+          fileInput.value = '';
+
+          setVideoUrl(null);
+        }}
+      >
+        Select URL
+      </button>
 
       <Control aria-current={autoPlay} onClick={() => setAutoPlay(!autoPlay)}>
         Autoplay
