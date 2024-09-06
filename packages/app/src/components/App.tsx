@@ -11,6 +11,7 @@ import {
   flipLayoutAtom,
   formatAtom,
   layoutAtom,
+  videoUrlAtom,
 } from 'atoms/controls';
 import { getImageFrames } from 'helper/getImageFrames';
 import { transfer, wrap } from 'comlink';
@@ -28,6 +29,7 @@ const worker = wrap<VideoRecognitionWorker>(
 export function App() {
   const videoRef = useRef<HTMLVideoElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
+  const urlInputRef = useRef<HTMLInputElement>(null);
 
   const [layout, setLayout] = useAtom(layoutAtom);
   const [flipLayout] = useAtom(flipLayoutAtom);
@@ -39,6 +41,7 @@ export function App() {
   const [autoDetect] = useAtom(autoDetectAtom);
 
   const [file, setFile] = useState<File | null>(null);
+  const [videoUrl, setVideoUrl] = useAtom(videoUrlAtom);
   const [ready, setReady] = useState(false);
 
   const [, xrSession] = useXRSession();
@@ -67,17 +70,28 @@ export function App() {
   useEffect(() => {
     let objectUrl = '';
 
-    if (file && videoRef.current) {
-      setReady(false);
-
+    if (file) {
       objectUrl = URL.createObjectURL(file);
-      videoRef.current.src = objectUrl;
+      setVideoUrl(objectUrl);
     }
 
     return () => {
       URL.revokeObjectURL(objectUrl);
     };
-  }, [file, setReady]);
+  }, [file, setVideoUrl]);
+
+  useEffect(() => {
+    if (ready && urlInputRef.current) {
+      urlInputRef.current.value = '';
+    }
+  }, [ready]);
+
+  useEffect(() => {
+    if (videoRef.current) {
+      setReady(false);
+      videoRef.current.src = videoUrl ?? '';
+    }
+  }, [videoUrl]);
 
   const { getRootProps, getInputProps, isDragActive } = useDropzone({
     noClick: true,
@@ -134,18 +148,44 @@ export function App() {
           autoPlay={autoPlay}
           loop
           onLoadedData={() => setReady(true)}
+          crossOrigin="anonymous"
         />
         <div
           hidden={ready}
-          className={clsx('h-full flex flex-col justify-center items-center', {
-            hidden: ready,
-          })}
+          className={clsx(
+            'h-full flex flex-col justify-center items-center gap-4',
+            {
+              hidden: ready,
+            },
+          )}
         >
-          <div className="text-center text-xl font-medium p-8">
+          <div className="text-center text-xl font-medium">
             <span className="inline-block">
               Just drag and drop a video file anywhere to play!
             </span>{' '}
             <span className="inline-block">(It never leaves your browser)</span>
+          </div>
+          <div>or</div>
+          <div className="flex gap-2 items-center">
+            <label htmlFor="url-input">Enter URL</label>
+            <div>
+              <input
+                type="url"
+                autoComplete="off"
+                spellCheck="false"
+                autoCorrect="off"
+                autoCapitalize="off"
+                ref={urlInputRef}
+                id="url-input"
+                className="w-96 p-2 my-4 bg-gray-800 text-white rounded border border-gray-600"
+                placeholder="https://example.com/video.mp4"
+                onChange={(e) => {
+                  if (e.target.value) {
+                    setVideoUrl(e.target.value);
+                  }
+                }}
+              />
+            </div>
           </div>
         </div>
       </div>

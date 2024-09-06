@@ -4,7 +4,7 @@ export async function getImageFrames(
   video: HTMLVideoElement,
 ): Promise<ImageData[]> {
   const canvas = document.createElement('canvas');
-  const ctx = canvas.getContext('2d');
+  const ctx = canvas.getContext('2d', { willReadFrequently: true });
 
   if (!ctx) {
     return [];
@@ -24,6 +24,7 @@ export async function getImageFrames(
     .slice(1, -1);
 
   const videoClone = document.createElement('video');
+  videoClone.crossOrigin = 'anonymous';
   videoClone.src = video.src;
   videoClone.muted = true;
   videoClone.pause();
