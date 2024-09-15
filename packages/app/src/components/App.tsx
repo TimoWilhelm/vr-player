@@ -153,7 +153,7 @@ export function App() {
         <div
           hidden={ready}
           className={clsx(
-            'h-full flex flex-col justify-center items-center gap-4',
+            'h-full flex flex-col justify-center items-center gap-2',
             {
               hidden: ready,
             },
@@ -165,9 +165,15 @@ export function App() {
             </span>{' '}
             <span className="inline-block">(It never leaves your browser)</span>
           </div>
-          <div>or</div>
-          <div className="flex gap-2 items-center">
-            <label htmlFor="url-input">Enter URL</label>
+          <div className="flex items-center justify-center gap-4 w-full px-4">
+            <hr className="max-w-64 h-0.5 bg-gray-200 border-0 rounded flex-1" />
+            or
+            <hr className="max-w-64 h-0.5 my-8 bg-gray-200 border-0 rounded flex-1" />
+          </div>
+          <div className="flex flex-col items-center">
+            <label htmlFor="url-input" className="font-semibold">
+              Enter Video URL
+            </label>
             <div>
               <input
                 type="url"
