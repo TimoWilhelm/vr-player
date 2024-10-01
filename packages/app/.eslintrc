@@ -1,22 +1,25 @@
 {
   "env": {
-    "jest": true
+    "jest": true,
   },
-  "plugins": [
-    "react"
-  ],
+  "plugins": ["react"],
   "extends": [
-    "airbnb",
-    "airbnb-typescript",
-    "airbnb/hooks",
     "plugin:react/recommended",
     "plugin:react/jsx-runtime",
-    "../../.eslintrc"
+    "../../.eslintrc",
   ],
   "parserOptions": {
     "sourceType": "module",
-    "project": [
-      "./tsconfig.json"
-    ]
-  }
+    "project": ["./tsconfig.json"],
+  },
+  "settings": {
+    "react": {
+      "version": "detect",
+    },
+    "import/resolver": {
+      "node": {
+        "paths": ["src"],
+      },
+    },
+  },
 }

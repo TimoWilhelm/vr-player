@@ -1,30 +1,40 @@
 {
   "root": true,
   "env": {
-    "es6": true
+    "es6": true,
   },
   "parser": "@typescript-eslint/parser",
   "parserOptions": {
-    "ecmaVersion": 2017
+    "ecmaVersion": 2017,
   },
-  "plugins": [
-    "@typescript-eslint",
-    "prettier",
-    "sort-imports-es6-autofix"
-  ],
+  "plugins": ["@typescript-eslint", "prettier", "sort-imports-es6-autofix"],
   "extends": [
     "eslint:recommended",
-    "plugin:@typescript-eslint/eslint-recommended",
+    "plugin:import/recommended",
+    "plugin:import/typescript",
     "plugin:@typescript-eslint/recommended",
     "plugin:@typescript-eslint/recommended-requiring-type-checking",
-    "plugin:prettier/recommended"
+    "plugin:prettier/recommended",
   ],
+  "settings": {
+    "import/parsers": {
+      "@typescript-eslint/parser": [".ts", ".tsx"],
+    },
+    "import/resolver": {
+      "typescript": {
+        "alwaysTryTypes": true, // always try to resolve types under `<root>@types` directory even it doesn't contain any source code, like `@types/unist`
+
+        // use a glob pattern
+        "project": "packages/*/tsconfig.json",
+      },
+    },
+  },
   "rules": {
     "@typescript-eslint/no-explicit-any": [
       "error",
       {
-        "ignoreRestArgs": true
-      }
+        "ignoreRestArgs": true,
+      },
     ],
     "import/prefer-default-export": "off",
     "import/no-default-export": "error",
@@ -32,14 +42,8 @@
     "no-void": [
       "error",
       {
-        "allowAsStatement": true
-      }
-    ],
-    "no-unused-vars": [
-      "error",
-      {
-        "argsIgnorePattern": "^_"
-      }
+        "allowAsStatement": true,
+      },
     ],
     "react/require-default-props": "off",
     "react/jsx-props-no-spreading": "off",
@@ -47,8 +51,8 @@
       "error",
       {
         "prefer": "type-imports",
-        "disallowTypeAnnotations": false
-      }
+        "disallowTypeAnnotations": false,
+      },
     ],
     "import/order": "off",
     "sort-imports-es6-autofix/sort-imports-es6": [
@@ -56,23 +60,8 @@
       {
         "ignoreCase": false,
         "ignoreMemberSort": false,
-        "memberSyntaxSortOrder": [
-          "none",
-          "all",
-          "multiple",
-          "single"
-        ]
-      }
+        "memberSyntaxSortOrder": ["none", "all", "multiple", "single"],
+      },
     ],
-     "jsx-a11y/label-has-associated-control": ["error", {
-        "required": {
-          "some": ["nesting", "id"]
-        }
-      }],
-      "jsx-a11y/label-has-for": ["error", {
-        "required": {
-          "some": ["nesting", "id"]
-        }
-      }]
-  }
+  },
 }

@@ -5,10 +5,8 @@ import { Analytics } from '@vercel/analytics/react';
 import { App } from 'components/App';
 import { ConditionalWrapper } from 'components/util/ConditionalWrapper';
 import { createRoot } from 'react-dom/client';
-import { reportWebVitals } from './reportWebVitals';
 import { useAtomsDevtools } from 'jotai-devtools';
 import React from 'react';
-import type { Metric } from 'web-vitals';
 
 const isProduction = process.env.NODE_ENV === 'production';
 
@@ -32,11 +30,6 @@ root.render(
   </React.StrictMode>,
 );
 
-const sendToAnalytics = ({ id, name, value }: Metric) => {
-  // eslint-disable-next-line no-console
-  console.log(id, name, value);
-};
-
 serviceWorkerRegistration.register({
   onUpdate: (e) => {
     if (e.waiting) {
@@ -48,5 +41,3 @@ serviceWorkerRegistration.register({
     });
   },
 });
-
-reportWebVitals(sendToAnalytics);
