@@ -8,7 +8,7 @@ import { createRoot } from 'react-dom/client';
 import { useAtomsDevtools } from 'jotai-devtools';
 import React from 'react';
 
-const isProduction = process.env.NODE_ENV === 'production';
+const isProduction = import.meta.env.PROD;
 
 const AtomsDevtools = ({ children }: { children: React.ReactElement }) => {
   useAtomsDevtools('demo');

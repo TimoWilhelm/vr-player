@@ -1,4 +1,3 @@
-/* eslint-disable no-underscore-dangle */
 import { Renderer } from './renderer';
 import { mat4 } from 'gl-matrix';
 import type { Format, Layout } from '../types';
@@ -14,7 +13,7 @@ export class DebugRenderer extends Renderer {
     layout: Layout,
     flipLayout: boolean,
     format: Format,
-    private readonly view: 'left' | 'right',
+    private readonly eye: 'left' | 'right',
   ) {
     super(canvas, layout, flipLayout, format);
   }
@@ -27,7 +26,8 @@ export class DebugRenderer extends Renderer {
     const textureProps: Texture2DOptions = { data: this.video, flipY: true };
     const texture = this.regl.texture(textureProps);
 
-    const model = this.getModelMatrix(this.video);
+    const inverseModel = this.getInverseModelMatrix(this.video);
+    const formatInt = this.getFormatInt();
 
     const view = mat4.lookAt(mat4.create(), [0, 0, 0], [0, 0, -1], [0, 1, 0]);
 
@@ -36,19 +36,25 @@ export class DebugRenderer extends Renderer {
       Math.PI / 2,
       this.canvas.width / this.canvas.height,
       0.01,
-      Infinity,
+      100,
     );
 
+    const vp = mat4.create();
+    mat4.multiply(vp, projection, view);
+    const ivp = mat4.create();
+    mat4.invert(ivp, vp);
+
     const offsets = this.getTexCoordScaleOffsets();
-    const offset = this.view === 'left' ? offsets[0] : offsets[1];
+    const offset = this.eye === 'left' ? offsets[0] : offsets[1];
 
     const drawLoop = () => {
       this.regl.clear({ color: [0, 0, 0, 1], depth: 1 });
 
       const props: RenderProps = {
-        model,
-        view,
-        projection,
+        inverseViewProjection: ivp,
+        inverseModel,
+        eyePosition: new Float32Array([0, 0, 0]),
+        format: formatInt,
         texture: texture.subimage(textureProps),
         viewport: {
           x: 0,

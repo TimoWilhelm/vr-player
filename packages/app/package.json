@@ -2,69 +2,47 @@
   "name": "@vr-viewer/app",
   "version": "0.1.0",
   "private": true,
+  "type": "module",
   "dependencies": {
-    "@emotion/react": "^11.13.3",
-    "@heroicons/react": "^2.1.5",
-    "@testing-library/jest-dom": "^6.5.0",
-    "@testing-library/react": "^16.0.1",
-    "@testing-library/user-event": "^14.5.2",
-    "@types/jest": "^29.5.13",
-    "@types/node": "^22.7.4",
-    "@types/react": "^18.3.10",
-    "@types/react-dom": "^18.3.0",
-    "@types/webxr": "^0.5.20",
-    "@vercel/analytics": "^1.3.1",
+    "@emotion/react": "^11.14.0",
+    "@heroicons/react": "^2.2.0",
+    "@tailwindcss/postcss": "^4.2.2",
+    "@types/node": "^25.5.0",
+    "@types/react": "^19.2.14",
+    "@types/react-dom": "^19.2.3",
+    "@types/webxr": "^0.5.24",
+    "@vercel/analytics": "^2.0.1",
     "@vr-viewer/player": "*",
-    "autoprefixer": "^10.4.20",
+    "autoprefixer": "^10.4.27",
     "clsx": "^2.1.1",
-    "comlink": "^4.4.1",
-    "jest-canvas-mock": "^2.5.2",
-    "jotai": "^2.10.0",
-    "jotai-devtools": "^0.10.1",
-    "postcss": "^8.4.47",
-    "react": "^18.3.1",
-    "react-dom": "^18.3.1",
-    "react-dropzone": "^14.2.3",
-    "react-hot-toast": "^2.4.1",
-    "react-scripts": "5.0.1",
-    "tailwindcss": "^3.4.13",
+    "comlink": "^4.4.2",
+    "jotai": "^2.19.0",
+    "jotai-devtools": "^0.13.0",
+    "postcss": "^8.5.8",
+    "react": "^19.2.4",
+    "react-dom": "^19.2.4",
+    "react-dropzone": "^15.0.0",
+    "react-hot-toast": "^2.6.0",
+    "tailwindcss": "^4.2.2",
     "typescript": "^5.4.3",
-    "web-vitals": "^4.2.3",
+    "web-vitals": "^5.2.0",
     "webxr-polyfill": "^2.0.3",
-    "workbox-background-sync": "^7.1.0",
-    "workbox-broadcast-update": "^7.1.0",
-    "workbox-cacheable-response": "^7.1.0",
-    "workbox-core": "^7.1.0",
-    "workbox-expiration": "^7.1.0",
-    "workbox-navigation-preload": "^7.1.0",
-    "workbox-precaching": "^7.1.0",
-    "workbox-range-requests": "^7.1.0",
-    "workbox-routing": "^7.1.0",
-    "workbox-strategies": "^7.1.0",
-    "workbox-streams": "^7.1.0"
+    "workbox-cacheable-response": "^7.4.0",
+    "workbox-core": "^7.4.0",
+    "workbox-expiration": "^7.4.0",
+    "workbox-precaching": "^7.4.0",
+    "workbox-routing": "^7.4.0",
+    "workbox-strategies": "^7.4.0"
+  },
+  "devDependencies": {
+    "@vitejs/plugin-react": "^4.3.4",
+    "vite": "^6.3.2",
+    "vite-plugin-pwa": "^0.21.1"
   },
   "scripts": {
-    "start": "react-scripts start",
-    "build": "react-scripts build",
-    "test": "react-scripts test",
+    "start": "vite",
+    "build": "vite build",
+    "preview": "vite preview",
     "lint": "eslint ."
-  },
-  "eslintConfig": {
-    "extends": [
-      "react-app",
-      "react-app/jest"
-    ]
-  },
-  "browserslist": {
-    "production": [
-      ">0.2%",
-      "not dead",
-      "not op_mini all"
-    ],
-    "development": [
-      "last 1 chrome version",
-      "last 1 firefox version",
-      "last 1 safari version"
-    ]
   }
 }

@@ -107,50 +107,33 @@ export function UI({ fileInputProps }: { fileInputProps: DropzoneInputProps }) {
         </Control>
       </div>
 
-      <div className="flex flex-col items-center">
-        <GroupControl>
-          <GroupControlElement
-            aria-current={layout === 'mono'}
-            onClick={() => setLayout('mono')}
-          >
-            Mono
-          </GroupControlElement>
-          <GroupControlElement
-            aria-current={layout === 'stereoLeftRight'}
-            onClick={() => setLayout('stereoLeftRight')}
-          >
-            Left | Right
-          </GroupControlElement>
-          <GroupControlElement
-            aria-current={layout === 'stereoTopBottom'}
-            onClick={() => setLayout('stereoTopBottom')}
-          >
-            Top | Bottom
-          </GroupControlElement>
-        </GroupControl>
-
-        <div
-          className={clsx({
-            hidden: !(
-              layout === 'stereoLeftRight' || layout === 'stereoTopBottom'
-            ),
-          })}
+      <GroupControl>
+        <GroupControlElement
+          aria-current={layout === 'mono'}
+          onClick={() => setLayout('mono')}
         >
-          <label htmlFor="flip-orientation-input" className="flex items-center">
-            <input
-              id="flip-orientation-input"
-              type="checkbox"
-              className="block w-4 h-4 mr-2"
-              checked={flipLayout}
-              onChange={() => {
-                setFlipLayout(!flipLayout);
-              }}
-            />
-
-            <div>Flip Layout</div>
-          </label>
-        </div>
-      </div>
+          Mono
+        </GroupControlElement>
+        <GroupControlElement
+          aria-current={layout === 'stereoLeftRight'}
+          onClick={() => setLayout('stereoLeftRight')}
+        >
+          Left | Right
+        </GroupControlElement>
+        <GroupControlElement
+          aria-current={layout === 'stereoTopBottom'}
+          onClick={() => setLayout('stereoTopBottom')}
+        >
+          Top | Bottom
+        </GroupControlElement>
+        <GroupControlElement
+          aria-current={flipLayout && layout !== 'mono'}
+          disabled={layout === 'mono'}
+          onClick={() => setFlipLayout(!flipLayout)}
+        >
+          Flip
+        </GroupControlElement>
+      </GroupControl>
 
       <GroupControl>
         <GroupControlElement

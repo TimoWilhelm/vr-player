@@ -5,9 +5,9 @@
   "main": "lib/index.js",
   "types": "lib/index.d.ts",
   "dependencies": {
-    "@types/webxr": "^0.5.20",
-    "gl-matrix": "^3.4.3",
-    "regl": "^2.1.0",
+    "@types/webxr": "^0.5.24",
+    "gl-matrix": "^3.4.4",
+    "regl": "^2.1.1",
     "typescript": "^5.4.3"
   },
   "scripts": {

@@ -4,6 +4,6 @@ export const ConditionalWrapper = ({
   children,
 }: {
   condition: boolean;
-  wrapper: (children: React.ReactElement) => JSX.Element;
+  wrapper: (children: React.ReactElement) => React.ReactElement;
   children: React.ReactElement;
-}) => (condition ? wrapper(children) : children);
+}): React.ReactElement => (condition ? wrapper(children) : children);
