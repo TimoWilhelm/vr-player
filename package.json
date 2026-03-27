@@ -6,6 +6,8 @@
   "scripts": {
     "start": "npm run start --workspace packages/app",
     "build": "npm run build --workspaces --if-present",
+    "deploy": "npm run deploy --workspace packages/app",
+    "preview:pages": "npm run preview:pages --workspace packages/app",
     "lint": "npm run lint --workspaces --if-present",
     "test": "npm run test --workspaces --if-present",
     "update": "ncu && npm install"

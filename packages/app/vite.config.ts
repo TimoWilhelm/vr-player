@@ -1,12 +1,14 @@
+import { cloudflare } from '@cloudflare/vite-plugin';
 import { defineConfig } from 'vite';
 import react from '@vitejs/plugin-react';
 import { VitePWA } from 'vite-plugin-pwa';
 import path from 'path';
 
 export default defineConfig({
-  envPrefix: ['VITE_', 'REACT_APP_'],
+  envPrefix: 'VITE_',
   plugins: [
     react(),
+    cloudflare(),
     VitePWA({
       strategies: 'injectManifest',
       srcDir: 'src',
