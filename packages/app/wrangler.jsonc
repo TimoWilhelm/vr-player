@@ -1,0 +1,8 @@
+{
+  "$schema": "node_modules/wrangler/config-schema.json",
+  "name": "vr-player",
+  "compatibility_date": "2024-09-23",
+  "assets": {
+    "not_found_handling": "single-page-application",
+  },
+}

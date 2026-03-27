@@ -20,7 +20,7 @@ export class VrRenderer extends Renderer {
   }
 
   protected stopDrawLoop(): void {
-    window.cancelAnimationFrame(this.raf);
+    this.xrSession.cancelAnimationFrame(this.raf);
   }
 
   protected async startDrawLoop(): Promise<void> {
@@ -35,9 +35,11 @@ export class VrRenderer extends Renderer {
     const textureProps: Texture2DOptions = { data: this.video, flipY: true };
     const texture = this.regl.texture(textureProps);
 
-    const model = this.getModelMatrix(this.video);
+    const inverseModel = this.getInverseModelMatrix(this.video);
+    const formatInt = this.getFormatInt();
 
-    const view = mat4.create();
+    const vp = mat4.create();
+    const ivp = mat4.create();
 
     const offsets = this.getTexCoordScaleOffsets();
     const xrReferenceSpace =
@@ -51,6 +53,7 @@ export class VrRenderer extends Renderer {
       const pose = xrFrame.getViewerPose(xrReferenceSpace);
 
       if (!glLayer || !pose) {
+        this.raf = this.xrSession.requestAnimationFrame(drawLoop);
         return;
       }
 
@@ -77,14 +80,20 @@ export class VrRenderer extends Renderer {
           throw new Error('Viewport is undefined');
         }
 
+        const view = mat4.translate(
+          mat4.create(),
+          poseView.transform.inverse.matrix,
+          vec3.fromValues(position.x, position.y, position.z),
+        );
+
+        mat4.multiply(vp, poseView.projectionMatrix as mat4, view);
+        mat4.invert(ivp, vp);
+
         const props: RenderProps = {
-          model,
-          view: mat4.translate(
-            view,
-            poseView.transform.inverse.matrix,
-            vec3.fromValues(position.x, position.y, position.z),
-          ),
-          projection: poseView.projectionMatrix,
+          inverseViewProjection: ivp,
+          inverseModel,
+          eyePosition: new Float32Array([position.x, position.y, position.z]),
+          format: formatInt,
           texture: texture.subimage(textureProps),
           viewport,
           texCoordScaleOffset:
