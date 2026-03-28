@@ -16,9 +16,166 @@ const QUAD_INDICES = [
   [0, 2, 3],
 ];
 
-const FORMAT_360 = 0;
-const FORMAT_180 = 1;
-const FORMAT_SCREEN = 2;
+const VERT_SHADER = `
+precision highp float;
+
+attribute vec3 position;
+
+varying vec2 clipCoord;
+
+void main() {
+  clipCoord = position.xy;
+  gl_Position = vec4(position.xy, 0.0, 1.0);
+}
+`;
+
+const RAY_PREAMBLE = `
+precision highp float;
+
+#define PI 3.14159265359
+#define TWO_PI 6.28318530718
+#define SPHERE_RADIUS 1.0
+
+uniform mat4 inverseModelViewProjection;
+uniform vec3 modelSpaceEye;
+uniform sampler2D texture;
+uniform mediump vec4 texCoordScaleOffset;
+
+varying vec2 clipCoord;
+
+void getRay(out vec3 rayOrigin, out vec3 rayDir) {
+  rayOrigin = modelSpaceEye;
+  vec4 nearModel = inverseModelViewProjection * vec4(clipCoord, -1.0, 1.0);
+  vec4 farModel  = inverseModelViewProjection * vec4(clipCoord,  1.0, 1.0);
+  nearModel /= nearModel.w;
+  farModel  /= farModel.w;
+  rayDir = normalize(farModel.xyz - nearModel.xyz);
+}
+`;
+
+// 360°: viewer is always inside the sphere, no discard needed
+const FRAG_360 =
+  RAY_PREAMBLE +
+  `
+void main() {
+  vec3 rayOrigin, rayDir;
+  getRay(rayOrigin, rayDir);
+
+  // Simplified quadratic (rayDir is normalized so a=1)
+  float halfB = dot(rayOrigin, rayDir);
+  float c = dot(rayOrigin, rayOrigin) - SPHERE_RADIUS * SPHERE_RADIUS;
+  float t = -halfB + sqrt(halfB * halfB - c);
+  vec3 hit = rayOrigin + t * rayDir;
+
+  float theta = atan(hit.z, hit.x);
+  float phi   = asin(clamp(hit.y / SPHERE_RADIUS, -1.0, 1.0));
+
+  mediump vec2 uv = vec2(theta / TWO_PI + 0.5, phi / PI + 0.5);
+  mediump vec2 mappedUv = uv * texCoordScaleOffset.xy + texCoordScaleOffset.zw;
+  gl_FragColor = texture2D(texture, mappedUv);
+}
+`;
+
+// 180°: same ray-sphere but discard back hemisphere
+const FRAG_180 =
+  RAY_PREAMBLE +
+  `
+void main() {
+  vec3 rayOrigin, rayDir;
+  getRay(rayOrigin, rayDir);
+
+  float halfB = dot(rayOrigin, rayDir);
+  float c = dot(rayOrigin, rayOrigin) - SPHERE_RADIUS * SPHERE_RADIUS;
+  float disc = halfB * halfB - c;
+  if (disc < 0.0) discard;
+  float t = -halfB + sqrt(disc);
+  vec3 hit = rayOrigin + t * rayDir;
+
+  float theta = atan(hit.z, hit.x);
+  float phi   = asin(clamp(hit.y / SPHERE_RADIUS, -1.0, 1.0));
+
+  mediump vec2 uv = vec2(theta / TWO_PI + 0.5, phi / PI + 0.5);
+
+  // discard back hemisphere
+  if (uv.x < 0.25 || uv.x > 0.75) discard;
+  // remap [0.25, 0.75] -> [0, 1]
+  uv.x = (uv.x - 0.25) * 2.0;
+
+  mediump vec2 mappedUv = uv * texCoordScaleOffset.xy + texCoordScaleOffset.zw;
+  gl_FragColor = texture2D(texture, mappedUv);
+}
+`;
+
+// Screen: ray-plane intersection
+const FRAG_SCREEN =
+  RAY_PREAMBLE +
+  `
+void main() {
+  vec3 rayOrigin, rayDir;
+  getRay(rayOrigin, rayDir);
+
+  // ray-plane intersection: screen quad lies at z = 0, spanning [-1,1] in x and y
+  float t = -rayOrigin.z / rayDir.z;
+  if (t < 0.0) discard;
+  vec3 hit = rayOrigin + t * rayDir;
+  if (abs(hit.x) > 1.0 || abs(hit.y) > 1.0) discard;
+  mediump vec2 uv = vec2(1.0 - (hit.x * 0.5 + 0.5), hit.y * 0.5 + 0.5);
+
+  mediump vec2 mappedUv = uv * texCoordScaleOffset.xy + texCoordScaleOffset.zw;
+  gl_FragColor = texture2D(texture, mappedUv);
+}
+`;
+
+function getFragShader(format: Format): string {
+  switch (format) {
+    case '360':
+      return FRAG_360;
+    case '180':
+      return FRAG_180;
+    case 'screen':
+    // falls through
+    default:
+      return FRAG_SCREEN;
+  }
+}
+
+export class VideoFrameTracker {
+  private hasNewFrame = true;
+  private vfcHandle = 0;
+  private stopped = false;
+
+  constructor(private readonly video: HTMLVideoElement) {
+    if ('requestVideoFrameCallback' in video) {
+      this.hasNewFrame = false;
+      this.scheduleCallback();
+    }
+    // If requestVideoFrameCallback is not supported, hasNewFrame stays true
+    // so every render frame will upload the texture (legacy behavior).
+  }
+
+  private scheduleCallback() {
+    if (this.stopped) return;
+    this.vfcHandle = this.video.requestVideoFrameCallback(() => {
+      this.hasNewFrame = true;
+      this.scheduleCallback();
+    });
+  }
+
+  consumeFrame(): boolean {
+    if (this.hasNewFrame) {
+      this.hasNewFrame = false;
+      return true;
+    }
+    return false;
+  }
+
+  stop() {
+    this.stopped = true;
+    if ('cancelVideoFrameCallback' in this.video) {
+      this.video.cancelVideoFrameCallback(this.vfcHandle);
+    }
+  }
+}
 
 export abstract class Renderer {
   protected abstract startDrawLoop(): Promise<void>;
@@ -49,102 +206,20 @@ export abstract class Renderer {
     this.regl = reglInit({ pixelRatio: 1, canvas: this.canvas });
 
     this.cmdRender = this.regl({
-      vert: `
-      precision highp float;
-
-      attribute vec3 position;
-
-      varying vec2 clipCoord;
-
-      void main() {
-        clipCoord = position.xy;
-        gl_Position = vec4(position.xy, 0.0, 1.0);
-      }
-      `,
-      frag: `
-      precision highp float;
-
-      #define FORMAT_360  0
-      #define FORMAT_180  1
-      #define FORMAT_SCREEN 2
-
-      #define PI 3.14159265359
-      #define TWO_PI 6.28318530718
-      #define SPHERE_RADIUS 1.0
-
-      uniform mat4 inverseViewProjection;
-      uniform mat4 inverseModel;
-      uniform vec3 eyePosition;
-      uniform int format;
-      uniform sampler2D texture;
-      uniform vec4 texCoordScaleOffset;
-
-      varying vec2 clipCoord;
-
-      void main() {
-        // reconstruct world-space ray from clip coords
-        vec4 nearWorld = inverseViewProjection * vec4(clipCoord, -1.0, 1.0);
-        vec4 farWorld  = inverseViewProjection * vec4(clipCoord,  1.0, 1.0);
-        nearWorld /= nearWorld.w;
-        farWorld  /= farWorld.w;
-
-        vec3 worldRayDir = normalize(farWorld.xyz - nearWorld.xyz);
-
-        // transform ray into model space
-        vec3 rayOrigin = (inverseModel * vec4(eyePosition, 1.0)).xyz;
-        vec3 rayDir    = normalize((inverseModel * vec4(worldRayDir, 0.0)).xyz);
-
-        vec2 uv;
-
-        if (format == FORMAT_SCREEN) {
-          // ray-plane intersection: screen quad lies at z = 0, spanning [-1,1] in x and y
-          float t = -rayOrigin.z / rayDir.z;
-          if (t < 0.0) discard;
-          vec3 hit = rayOrigin + t * rayDir;
-          if (abs(hit.x) > 1.0 || abs(hit.y) > 1.0) discard;
-          uv = vec2(1.0 - (hit.x * 0.5 + 0.5), hit.y * 0.5 + 0.5);
-        } else {
-          // ray-sphere intersection (viewer inside sphere of SPHERE_RADIUS)
-          float a = dot(rayDir, rayDir);
-          float b = 2.0 * dot(rayOrigin, rayDir);
-          float c = dot(rayOrigin, rayOrigin) - SPHERE_RADIUS * SPHERE_RADIUS;
-          float disc = b * b - 4.0 * a * c;
-          if (disc < 0.0) discard;
-          float t = (-b + sqrt(disc)) / (2.0 * a);
-          vec3 hit = rayOrigin + t * rayDir;
-
-          // spherical coords to equirectangular UV
-          float theta = atan(hit.z, hit.x);         // [-PI, PI]
-          float phi   = asin(clamp(hit.y / SPHERE_RADIUS, -1.0, 1.0)); // [-PI/2, PI/2]
-
-          uv = vec2(theta / TWO_PI + 0.5, phi / PI + 0.5);
-
-          if (format == FORMAT_180) {
-            // discard back hemisphere
-            if (uv.x < 0.25 || uv.x > 0.75) discard;
-            // remap [0.25, 0.75] -> [0, 1]
-            uv.x = (uv.x - 0.25) * 2.0;
-          }
-        }
-
-        vec2 mappedUv = uv * texCoordScaleOffset.xy + texCoordScaleOffset.zw;
-        gl_FragColor = texture2D(texture, mappedUv);
-      }
-      `,
+      vert: VERT_SHADER,
+      frag: getFragShader(this.format),
       attributes: {
         position: QUAD_POSITIONS,
       },
       // TODO: https://github.com/regl-project/regl/pull/632
       uniforms: {
-        inverseViewProjection: this.regl.prop<
+        inverseModelViewProjection: this.regl.prop<
           RenderProps,
-          'inverseViewProjection'
-        >('inverseViewProjection'),
-        inverseModel: this.regl.prop<RenderProps, 'inverseModel'>(
-          'inverseModel',
+          'inverseModelViewProjection'
+        >('inverseModelViewProjection'),
+        modelSpaceEye: this.regl.prop<RenderProps, 'modelSpaceEye'>(
+          'modelSpaceEye',
         ),
-        eyePosition: this.regl.prop<RenderProps, 'eyePosition'>('eyePosition'),
-        format: this.regl.prop<RenderProps, 'format'>('format'),
         texture: this.regl.prop<RenderProps, 'texture'>('texture'),
         texCoordScaleOffset: this.regl.prop<RenderProps, 'texCoordScaleOffset'>(
           'texCoordScaleOffset',
@@ -153,19 +228,6 @@ export abstract class Renderer {
       viewport: this.regl.prop<RenderProps, 'viewport'>('viewport'),
       elements: QUAD_INDICES,
     });
-  }
-
-  protected getFormatInt(): number {
-    switch (this.format) {
-      case '360':
-        return FORMAT_360;
-      case '180':
-        return FORMAT_180;
-      case 'screen':
-      // falls through
-      default:
-        return FORMAT_SCREEN;
-    }
   }
 
   private getAspectRatio(video: HTMLVideoElement) {

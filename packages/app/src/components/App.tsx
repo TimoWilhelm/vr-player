@@ -23,7 +23,9 @@ import clsx from 'clsx';
 import type { VideoRecognitionWorker } from 'worker/videoRecognition.worker';
 
 const worker = wrap<VideoRecognitionWorker>(
-  new Worker(new URL('worker/videoRecognition.worker', import.meta.url)),
+  new Worker(new URL('worker/videoRecognition.worker', import.meta.url), {
+    type: 'module',
+  }),
 );
 
 export function App() {

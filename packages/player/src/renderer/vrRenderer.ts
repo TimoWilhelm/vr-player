@@ -1,12 +1,13 @@
 /* eslint-disable no-underscore-dangle */
-import { Renderer } from './renderer';
-import { mat4, vec3 } from 'gl-matrix';
+import { Renderer, VideoFrameTracker } from './renderer';
+import { mat4, vec4 } from 'gl-matrix';
 import type { Format, Layout } from '../types';
 import type { RenderProps } from './renderProps';
 import type { Texture2DOptions } from 'regl';
 
 export class VrRenderer extends Renderer {
   private raf = 0;
+  private frameTracker: VideoFrameTracker | null = null;
 
   constructor(
     private readonly xrSession: XRSession,
@@ -21,6 +22,7 @@ export class VrRenderer extends Renderer {
 
   protected stopDrawLoop(): void {
     this.xrSession.cancelAnimationFrame(this.raf);
+    this.frameTracker?.stop();
   }
 
   protected async startDrawLoop(): Promise<void> {
@@ -32,14 +34,24 @@ export class VrRenderer extends Renderer {
       depthNear: this.xrSession.renderState.depthNear,
     });
 
+    const rates = this.xrSession.supportedFrameRates;
+    if (rates && rates.length > 0) {
+      const maxRate = Math.max(...Array.from(rates));
+      await this.xrSession.updateTargetFrameRate(maxRate);
+    }
+
     const textureProps: Texture2DOptions = { data: this.video, flipY: true };
     const texture = this.regl.texture(textureProps);
+    this.frameTracker = new VideoFrameTracker(this.video);
+    const { frameTracker } = this;
 
     const inverseModel = this.getInverseModelMatrix(this.video);
-    const formatInt = this.getFormatInt();
 
     const vp = mat4.create();
     const ivp = mat4.create();
+    const imvp = mat4.create();
+    const modelSpaceEye = new Float32Array(3);
+    const tempEye = vec4.create();
 
     const offsets = this.getTexCoordScaleOffsets();
     const xrReferenceSpace =
@@ -70,6 +82,11 @@ export class VrRenderer extends Renderer {
         this.regl._gl.DEPTH_BUFFER_BIT | this.regl._gl.COLOR_BUFFER_BIT,
       );
 
+      // Upload video texture only when a new decoded frame is available
+      if (frameTracker.consumeFrame()) {
+        texture.subimage(textureProps);
+      }
+
       // Render each eye.
       pose.views.forEach((poseView) => {
         const { position } = poseView.transform;
@@ -80,21 +97,26 @@ export class VrRenderer extends Renderer {
           throw new Error('Viewport is undefined');
         }
 
-        const view = mat4.translate(
-          mat4.create(),
+        mat4.multiply(
+          vp,
+          poseView.projectionMatrix as mat4,
           poseView.transform.inverse.matrix,
-          vec3.fromValues(position.x, position.y, position.z),
         );
-
-        mat4.multiply(vp, poseView.projectionMatrix as mat4, view);
         mat4.invert(ivp, vp);
+        // Combined inverse: inverseModel * inverseViewProjection
+        mat4.multiply(imvp, inverseModel, ivp);
+
+        // Model-space eye position: inverseModel * eyePosition
+        vec4.set(tempEye, position.x, position.y, position.z, 1.0);
+        vec4.transformMat4(tempEye, tempEye, inverseModel);
+        modelSpaceEye[0] = tempEye[0];
+        modelSpaceEye[1] = tempEye[1];
+        modelSpaceEye[2] = tempEye[2];
 
         const props: RenderProps = {
-          inverseViewProjection: ivp,
-          inverseModel,
-          eyePosition: new Float32Array([position.x, position.y, position.z]),
-          format: formatInt,
-          texture: texture.subimage(textureProps),
+          inverseModelViewProjection: imvp,
+          modelSpaceEye,
+          texture,
           viewport,
           texCoordScaleOffset:
             poseView.eye === 'left' ? offsets[0] : offsets[1],
